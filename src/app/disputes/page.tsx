@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Scale, 
+import {
+  Scale,
   Plus,
   MessageCircle,
   Eye,
@@ -63,7 +63,7 @@ export default function DisputesPage() {
               </h1>
               <p className="text-gray-600 mt-2">Manage project disputes and payment resolutions</p>
             </div>
-            <Button 
+            <Button
               className="bg-purple-600 hover:bg-purple-700"
               onClick={() => window.location.href = '/disputes/new'}
             >
@@ -86,7 +86,7 @@ export default function DisputesPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -100,7 +100,7 @@ export default function DisputesPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ export default function DisputesPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -159,10 +159,10 @@ export default function DisputesPage() {
                               {dispute.role}
                             </Badge>
                           </div>
-                          
+
                           <p className="text-gray-700 font-medium mb-1">{dispute.projectName}</p>
                           <p className="text-gray-600 text-sm mb-2">{dispute.reason}</p>
-                          
+
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-4 w-4" />
@@ -172,17 +172,17 @@ export default function DisputesPage() {
                             <span>Created: {dispute.createdAt}</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-3">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => window.location.href = `/disputes/${dispute.id}/messages`}
                           >
                             <MessageCircle className="h-4 w-4 mr-2" />
                             Messages
                           </Button>
-                          <Button 
+                          <Button
                             size="sm"
                             onClick={() => window.location.href = `/disputes/${dispute.id}`}
                           >
@@ -194,7 +194,7 @@ export default function DisputesPage() {
                     </CardContent>
                   </Card>
                 ))}
-                
+
                 {filterDisputes(tab).length === 0 && (
                   <Card>
                     <CardContent className="p-8 text-center">

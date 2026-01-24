@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Star, 
-  MapPin, 
-  Calendar, 
-  Edit, 
-  Briefcase, 
-  TrendingUp, 
-  Award, 
+import {
+  Star,
+  MapPin,
+  Calendar,
+  Edit,
+  Briefcase,
+  TrendingUp,
+  Award,
   Users,
   DollarSign,
   CheckCircle,
@@ -72,8 +73,12 @@ const reviews = [
   }
 ];
 
-export default function ProfilePage({ params }: { params: { username: string } }) {
+export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const router = useRouter();
+
+  // Unwrap params Promise using React.use()
+  const { username } = React.use(params);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -89,7 +94,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
                     <AvatarFallback className="text-2xl">JD</AvatarFallback>
                   </Avatar>
                   <h2 className="text-xl font-bold text-gray-900">John Doe</h2>
-                  <p className="text-gray-600">@{params.username}</p>
+                  <p className="text-gray-600">@{username}</p>
                   <Badge className="mt-2 bg-blue-100 text-blue-800">Freelancer</Badge>
                 </div>
 
@@ -120,7 +125,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
                   </div>
                 </div>
 
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => router.push('/edit-profile')}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
                 </Button>
@@ -147,8 +152,8 @@ export default function ProfilePage({ params }: { params: { username: string } }
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-700 leading-relaxed">
-                      Full-stack developer with 5+ years of experience building modern web applications. 
-                      Specialized in React, Node.js, and cloud technologies. Passionate about creating 
+                      Full-stack developer with 5+ years of experience building modern web applications.
+                      Specialized in React, Node.js, and cloud technologies. Passionate about creating
                       user-friendly interfaces and scalable backend systems.
                     </p>
                   </CardContent>
@@ -160,8 +165,8 @@ export default function ProfilePage({ params }: { params: { username: string } }
                   {portfolioItems.map((item) => (
                     <Card key={item.id} className="overflow-hidden">
                       <div className="aspect-video bg-gray-200 relative">
-                        <Image 
-                          src={item.image} 
+                        <Image
+                          src={item.image}
                           alt={item.title}
                           width={300}
                           height={200}
@@ -259,7 +264,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
                       </CardContent>
                     </Card>
                   </div>
-                  
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
@@ -294,7 +299,7 @@ export default function ProfilePage({ params }: { params: { username: string } }
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <div className="flex gap-4">
                     <Button className="flex-1" onClick={() => window.location.href = '/payment-demo'}>
                       <DollarSign className="h-4 w-4 mr-2" />

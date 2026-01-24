@@ -33,7 +33,7 @@ const categories = {
     subcategories: ['Graphic Design', 'Web Design', 'UI/UX Design', 'Branding', 'Other']
   },
   'development': {
-    label: 'Development Work', 
+    label: 'Development Work',
     subcategories: ['Web Development', 'Mobile Apps', 'Desktop Software', 'API Development', 'Other']
   },
   'content': {
@@ -87,7 +87,7 @@ export default function PostProjectPage() {
 
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     switch (step) {
       case 1:
         if (!projectData.title.trim()) newErrors.title = 'Project title is required';
@@ -111,7 +111,7 @@ export default function PostProjectPage() {
         if (!projectData.experienceLevel) newErrors.experienceLevel = 'Please select experience level';
         break;
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -163,7 +163,7 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tell us what you need done</h2>
               <p className="text-gray-600">We'll guide you to create the perfect brief. The more detail, the better.</p>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Project Title *</label>
@@ -171,22 +171,20 @@ export default function PostProjectPage() {
                   type="text"
                   value={projectData.title}
                   onChange={(e) => setProjectData(prev => ({ ...prev, title: e.target.value }))}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.title ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.title ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   placeholder="e.g., Build a modern e-commerce website"
                 />
                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Project Description *</label>
                 <textarea
                   value={projectData.description}
                   onChange={(e) => setProjectData(prev => ({ ...prev, description: e.target.value }))}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 ${errors.description ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   placeholder="Describe your project in detail. Include specific requirements, features, and any preferences you have."
                 />
                 <div className="flex justify-between items-center mt-1">
@@ -194,7 +192,7 @@ export default function PostProjectPage() {
                   <p className="text-gray-500 text-sm ml-auto">{projectData.description.length} characters</p>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -213,7 +211,7 @@ export default function PostProjectPage() {
                   </label>
                   <p className="text-xs text-gray-500 mt-1">PDF, DOC, ZIP, Images (Max 10MB each)</p>
                 </div>
-                
+
                 {projectData.files.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {projectData.files.map((file, index) => (
@@ -230,7 +228,7 @@ export default function PostProjectPage() {
             </div>
           </div>
         );
-        
+
       case 2:
         return (
           <div className="space-y-6">
@@ -238,18 +236,16 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Are you trying to hire a freelancer?</h2>
               <p className="text-gray-600">Let us know your intent so we can guide you properly.</p>
             </div>
-            
+
             <div className="space-y-3">
               <button
                 onClick={() => setProjectData(prev => ({ ...prev, intent: 'hire' }))}
-                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
-                  projectData.intent === 'hire' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                }`}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${projectData.intent === 'hire' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                  }`}
               >
                 <div className="flex items-center">
-                  <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                    projectData.intent === 'hire' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full border-2 mr-3 ${projectData.intent === 'hire' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                    }`}>
                     {projectData.intent === 'hire' && <Check className="h-3 w-3 text-white" />}
                   </div>
                   <div>
@@ -258,17 +254,15 @@ export default function PostProjectPage() {
                   </div>
                 </div>
               </button>
-              
+
               <button
                 onClick={() => setProjectData(prev => ({ ...prev, intent: 'job' }))}
-                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${
-                  projectData.intent === 'job' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                }`}
+                className={`w-full p-4 border-2 rounded-lg text-left transition-colors ${projectData.intent === 'job' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                  }`}
               >
                 <div className="flex items-center">
-                  <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                    projectData.intent === 'job' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-full border-2 mr-3 ${projectData.intent === 'job' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                    }`}>
                     {projectData.intent === 'job' && <Check className="h-3 w-3 text-white" />}
                   </div>
                   <div>
@@ -278,11 +272,11 @@ export default function PostProjectPage() {
                 </div>
               </button>
             </div>
-            
+
             {errors.intent && <p className="text-red-500 text-sm">{errors.intent}</p>}
           </div>
         );
-        
+
       case 3:
         return (
           <div className="space-y-6">
@@ -290,15 +284,14 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">What kind of service are you looking for?</h2>
               <p className="text-gray-600">Choose the category that best fits your project.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(categories).map(([key, category]) => (
                 <button
                   key={key}
                   onClick={() => setProjectData(prev => ({ ...prev, category: key, subcategory: '' }))}
-                  className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                    projectData.category === key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                  }`}
+                  className={`p-4 border-2 rounded-lg text-left transition-colors ${projectData.category === key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-gray-900">{category.label}</p>
@@ -307,11 +300,11 @@ export default function PostProjectPage() {
                 </button>
               ))}
             </div>
-            
+
             {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
           </div>
         );
-        
+
       case 4:
         const selectedCategory = categories[projectData.category as keyof typeof categories];
         return (
@@ -320,15 +313,14 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">What specific type of {selectedCategory?.label.toLowerCase()} do you need?</h2>
               <p className="text-gray-600">This helps us match you with the right freelancers.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {selectedCategory?.subcategories.map((sub) => (
                 <button
                   key={sub}
                   onClick={() => setProjectData(prev => ({ ...prev, subcategory: sub }))}
-                  className={`p-3 border-2 rounded-lg text-left transition-colors ${
-                    projectData.subcategory === sub ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                  }`}
+                  className={`p-3 border-2 rounded-lg text-left transition-colors ${projectData.subcategory === sub ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-gray-900">{sub}</p>
@@ -337,11 +329,11 @@ export default function PostProjectPage() {
                 </button>
               ))}
             </div>
-            
+
             {errors.subcategory && <p className="text-red-500 text-sm">{errors.subcategory}</p>}
           </div>
         );
-        
+
       case 5:
         return (
           <div className="space-y-6">
@@ -349,18 +341,17 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Project Details</h2>
               <p className="text-gray-600">Help freelancers understand your project scope and requirements.</p>
             </div>
-            
+
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Budget Type *</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {[{key: 'fixed', label: 'Fixed Price'}, {key: 'hourly', label: 'Hourly Rate'}].map((type) => (
+                  {[{ key: 'fixed', label: 'Fixed Price' }, { key: 'hourly', label: 'Hourly Rate' }].map((type) => (
                     <button
                       key={type.key}
                       onClick={() => setProjectData(prev => ({ ...prev, budgetType: type.key as 'fixed' | 'hourly' }))}
-                      className={`p-3 border-2 rounded-lg transition-colors ${
-                        projectData.budgetType === type.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                      className={`p-3 border-2 rounded-lg transition-colors ${projectData.budgetType === type.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
                     >
                       <p className="font-medium text-gray-900">{type.label}</p>
                     </button>
@@ -368,15 +359,14 @@ export default function PostProjectPage() {
                 </div>
                 {errors.budgetType && <p className="text-red-500 text-sm mt-1">{errors.budgetType}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Budget Range *</label>
                 <select
                   value={projectData.budgetRange}
                   onChange={(e) => setProjectData(prev => ({ ...prev, budgetRange: e.target.value }))}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.budgetRange ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.budgetRange ? 'border-red-500' : 'border-gray-300'
+                    }`}
                 >
                   <option value="">Select budget range</option>
                   <option value="under-500">Under $500</option>
@@ -387,22 +377,21 @@ export default function PostProjectPage() {
                 </select>
                 {errors.budgetRange && <p className="text-red-500 text-sm mt-1">{errors.budgetRange}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Project Duration *</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {[
-                    {key: 'less-1-week', label: 'Less than 1 week'},
-                    {key: '1-4-weeks', label: '1-4 weeks'},
-                    {key: '1-3-months', label: '1-3 months'},
-                    {key: 'more-3-months', label: 'More than 3 months'}
+                    { key: 'less-1-week', label: 'Less than 1 week' },
+                    { key: '1-4-weeks', label: '1-4 weeks' },
+                    { key: '1-3-months', label: '1-3 months' },
+                    { key: 'more-3-months', label: 'More than 3 months' }
                   ].map((duration) => (
                     <button
                       key={duration.key}
                       onClick={() => setProjectData(prev => ({ ...prev, duration: duration.key }))}
-                      className={`p-3 border-2 rounded-lg transition-colors ${
-                        projectData.duration === duration.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                      className={`p-3 border-2 rounded-lg transition-colors ${projectData.duration === duration.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
                     >
                       <p className="font-medium text-gray-900 text-sm">{duration.label}</p>
                     </button>
@@ -410,21 +399,20 @@ export default function PostProjectPage() {
                 </div>
                 {errors.duration && <p className="text-red-500 text-sm mt-1">{errors.duration}</p>}
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Experience Level *</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {[
-                    {key: 'beginner', label: 'Beginner', desc: 'New freelancers'},
-                    {key: 'intermediate', label: 'Intermediate', desc: 'Some experience'},
-                    {key: 'expert', label: 'Expert', desc: 'Highly experienced'}
+                    { key: 'beginner', label: 'Beginner', desc: 'New freelancers' },
+                    { key: 'intermediate', label: 'Intermediate', desc: 'Some experience' },
+                    { key: 'expert', label: 'Expert', desc: 'Highly experienced' }
                   ].map((level) => (
                     <button
                       key={level.key}
                       onClick={() => setProjectData(prev => ({ ...prev, experienceLevel: level.key }))}
-                      className={`p-3 border-2 rounded-lg transition-colors ${
-                        projectData.experienceLevel === level.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                      className={`p-3 border-2 rounded-lg transition-colors ${projectData.experienceLevel === level.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
                     >
                       <p className="font-medium text-gray-900">{level.label}</p>
                       <p className="text-sm text-gray-600">{level.desc}</p>
@@ -436,7 +424,7 @@ export default function PostProjectPage() {
             </div>
           </div>
         );
-        
+
       case 6:
         const suggestedSkills = skillSuggestions[projectData.subcategory as keyof typeof skillSuggestions] || [];
         return (
@@ -445,7 +433,7 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Skills & Technology</h2>
               <p className="text-gray-600">What skills should freelancers have? (Max 10 skills)</p>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Add Skills</label>
@@ -463,7 +451,7 @@ export default function PostProjectPage() {
                   </Button>
                 </div>
               </div>
-              
+
               {suggestedSkills.length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Suggested Skills</p>
@@ -481,7 +469,7 @@ export default function PostProjectPage() {
                   </div>
                 </div>
               )}
-              
+
               {projectData.skills.length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-700 mb-2">Selected Skills ({projectData.skills.length}/10)</p>
@@ -500,7 +488,7 @@ export default function PostProjectPage() {
             </div>
           </div>
         );
-        
+
       case 7:
         return (
           <div className="space-y-6">
@@ -508,27 +496,25 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Location & Visibility</h2>
               <p className="text-gray-600">Set your preferences for freelancer location and project visibility.</p>
             </div>
-            
+
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Freelancer Location Preference</label>
                 <div className="space-y-2">
                   {[
-                    {key: 'anywhere', label: 'Anywhere in the world'},
-                    {key: 'same-country', label: 'Same country as me'},
-                    {key: 'specific', label: 'Specific country'}
+                    { key: 'anywhere', label: 'Anywhere in the world' },
+                    { key: 'same-country', label: 'Same country as me' },
+                    { key: 'specific', label: 'Specific country' }
                   ].map((option) => (
                     <button
                       key={option.key}
                       onClick={() => setProjectData(prev => ({ ...prev, location: option.key }))}
-                      className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${
-                        projectData.location === option.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                      className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${projectData.location === option.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
                     >
                       <div className="flex items-center">
-                        <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                          projectData.location === option.key ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 mr-3 ${projectData.location === option.key ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                          }`}>
                           {projectData.location === option.key && <Check className="h-3 w-3 text-white" />}
                         </div>
                         <p className="font-medium text-gray-900">{option.label}</p>
@@ -537,25 +523,23 @@ export default function PostProjectPage() {
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Project Visibility</label>
                 <div className="space-y-2">
                   {[
-                    {key: 'public', label: 'Public', desc: 'Anyone can see and bid on this project'},
-                    {key: 'private', label: 'Private', desc: 'Only invited freelancers can see this project'}
+                    { key: 'public', label: 'Public', desc: 'Anyone can see and bid on this project' },
+                    { key: 'private', label: 'Private', desc: 'Only invited freelancers can see this project' }
                   ].map((option) => (
                     <button
                       key={option.key}
                       onClick={() => setProjectData(prev => ({ ...prev, visibility: option.key as 'public' | 'private' }))}
-                      className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${
-                        projectData.visibility === option.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                      className={`w-full p-3 border-2 rounded-lg text-left transition-colors ${projectData.visibility === option.key ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        }`}
                     >
                       <div className="flex items-center">
-                        <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                          projectData.visibility === option.key ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                        }`}>
+                        <div className={`w-4 h-4 rounded-full border-2 mr-3 ${projectData.visibility === option.key ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                          }`}>
                           {projectData.visibility === option.key && <Check className="h-3 w-3 text-white" />}
                         </div>
                         <div>
@@ -570,7 +554,7 @@ export default function PostProjectPage() {
             </div>
           </div>
         );
-        
+
       case 8:
         return (
           <div className="space-y-6">
@@ -578,41 +562,41 @@ export default function PostProjectPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Confirm</h2>
               <p className="text-gray-600">Please review your project details before posting.</p>
             </div>
-            
+
             <Card>
               <CardContent className="p-6 space-y-4">
                 <div>
                   <h3 className="font-semibold text-gray-900">Project Title</h3>
                   <p className="text-gray-700">{projectData.title}</p>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-gray-900">Description</h3>
                   <p className="text-gray-700">{projectData.description}</p>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="font-semibold text-gray-900">Category</h3>
                     <p className="text-gray-700">{categories[projectData.category as keyof typeof categories]?.label} → {projectData.subcategory}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-semibold text-gray-900">Budget</h3>
                     <p className="text-gray-700">{projectData.budgetType === 'fixed' ? 'Fixed Price' : 'Hourly'} - {projectData.budgetRange}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-semibold text-gray-900">Duration</h3>
                     <p className="text-gray-700">{projectData.duration}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-semibold text-gray-900">Experience Level</h3>
                     <p className="text-gray-700 capitalize">{projectData.experienceLevel}</p>
                   </div>
                 </div>
-                
+
                 {projectData.skills.length > 0 && (
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Skills Required</h3>
@@ -623,13 +607,13 @@ export default function PostProjectPage() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="font-semibold text-gray-900">Location Preference</h3>
                     <p className="text-gray-700 capitalize">{projectData.location.replace('-', ' ')}</p>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-semibold text-gray-900">Visibility</h3>
                     <p className="text-gray-700 capitalize">{projectData.visibility}</p>
@@ -639,7 +623,7 @@ export default function PostProjectPage() {
             </Card>
           </div>
         );
-        
+
       default:
         return null;
     }
@@ -653,13 +637,13 @@ export default function PostProjectPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/dashboard">
-                <Logo className="text-blue-600" />
+                <Logo className="text-blue-600" asLink={false} />
               </Link>
               <div className="hidden md:block">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <span>Step {currentStep} of {totalSteps}</span>
                   <div className="w-32 bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all"
                       style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                     ></div>
@@ -667,7 +651,7 @@ export default function PostProjectPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/api/placeholder/32/32" />
@@ -688,18 +672,18 @@ export default function PostProjectPage() {
               <Card>
                 <CardContent className="p-8">
                   {renderStep()}
-                  
+
                   {/* Navigation */}
                   <div className="flex justify-between mt-8 pt-6 border-t">
-                    <Button 
-                      variant="outline" 
-                      onClick={prevStep} 
+                    <Button
+                      variant="outline"
+                      onClick={prevStep}
                       disabled={currentStep === 1}
                     >
                       <ArrowLeft className="h-4 w-4 mr-2" />
                       Back
                     </Button>
-                    
+
                     {currentStep === totalSteps ? (
                       <div className="flex gap-3">
                         <Button variant="outline">Save as Draft</Button>
@@ -717,7 +701,7 @@ export default function PostProjectPage() {
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Helper Sidebar */}
             <div className="space-y-6">
               <Card>
@@ -732,7 +716,7 @@ export default function PostProjectPage() {
                   <p>• Respond quickly to freelancer questions</p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">🚀 What happens next?</CardTitle>

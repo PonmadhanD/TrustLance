@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Heart, 
-  MessageCircle, 
-  Share2, 
-  Users, 
-  Bell, 
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Users,
+  Bell,
   Plus,
   CheckCircle,
   Star,
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-6">
+      <div className="w-full px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Sidebar - Account Progress */}
           <div className="lg:col-span-1">

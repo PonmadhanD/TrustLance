@@ -15,15 +15,15 @@ export default function ConditionalLayout({
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
-  
+
   const isAuthPage = ["/login", "/signup", "/post-project"].includes(pathname);
   const isAuthenticatedRoute = [
-    "/dashboard", 
-    "/profile", 
-    "/wallet", 
-    "/projects", 
-    "/browse", 
-    "/manage", 
+    "/dashboard",
+    "/profile",
+    "/wallet",
+    "/projects",
+    "/browse",
+    "/manage",
     "/messages",
     "/lists",
     "/tasklists",
@@ -33,7 +33,8 @@ export default function ConditionalLayout({
     "/credit",
     "/project-updates",
     "/bookmarks",
-    "/prototyper"
+    "/prototyper",
+    "/disputes"
   ].some(route => pathname.startsWith(route));
 
   useEffect(() => {

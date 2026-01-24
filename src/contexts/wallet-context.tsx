@@ -8,6 +8,7 @@ interface User {
   defaultRole: 'CLIENT' | 'FREELANCER';
   email?: string;
   name?: string;
+  balance?: string; // Balance in ETH/MATIC
 }
 
 interface Project {
@@ -26,6 +27,8 @@ interface WalletContextType {
   switchRole: (projectId: string, role: 'CLIENT' | 'FREELANCER') => boolean;
   canActAsRole: (projectId: string, role: 'CLIENT' | 'FREELANCER') => boolean;
   projects: Project[];
+  getBalance: () => Promise<string>;
+  refreshBalance: () => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -50,13 +53,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const accounts = await window.ethereum.request({
           method: 'eth_requestAccounts'
         });
-        
+
         const walletAddress = accounts[0];
-        
+
         // Generate nonce and verify signature (simplified)
         const nonce = Math.random().toString(36);
         const message = `Sign this message to authenticate: ${nonce}`;
-        
+
         const signature = await window.ethereum.request({
           method: 'personal_sign',
           params: [message, walletAddress]
@@ -72,7 +75,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
         setUser(userData);
         setIsConnected(true);
-        
+
         localStorage.setItem('walletAddress', walletAddress);
       } else {
         // Fallback for demo - simulate wallet connection
@@ -83,7 +86,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           defaultRole: 'CLIENT',
           name: 'Demo User'
         };
-        
+
         setUser(userData);
         setIsConnected(true);
         localStorage.setItem('walletAddress', mockWallet);
@@ -101,10 +104,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const canActAsRole = (projectId: string, role: 'CLIENT' | 'FREELANCER'): boolean => {
     if (!user) return false;
-    
+
     const project = projects.find(p => p.id === projectId);
     if (!project) return true; // New project, can select role
-    
+
     // Role locking logic - critical rule
     if (role === 'CLIENT') {
       return project.clientWallet === user.walletAddress;
@@ -115,6 +118,35 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const switchRole = (projectId: string, role: 'CLIENT' | 'FREELANCER'): boolean => {
     return canActAsRole(projectId, role);
+  };
+
+  const getBalance = async (): Promise<string> => {
+    if (!user?.walletAddress) return '0.0';
+
+    try {
+      if (typeof window !== 'undefined' && window.ethereum) {
+        // Get balance in Wei
+        const balanceWei = await window.ethereum.request({
+          method: 'eth_getBalance',
+          params: [user.walletAddress, 'latest']
+        });
+
+        // Convert Wei to ETH/MATIC (1 ETH = 10^18 Wei)
+        const balanceEth = parseInt(balanceWei, 16) / 1e18;
+        return balanceEth.toFixed(6);
+      }
+      return '0.0';
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+      return '0.0';
+    }
+  };
+
+  const refreshBalance = async () => {
+    if (user) {
+      const balance = await getBalance();
+      setUser({ ...user, balance });
+    }
   };
 
   // Auto-connect on page load
@@ -132,6 +164,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Auto-refresh balance when connected
+  useEffect(() => {
+    if (isConnected && user) {
+      refreshBalance();
+      // Refresh balance every 15 seconds
+      const interval = setInterval(refreshBalance, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [isConnected, user?.walletAddress]);
+
   return (
     <WalletContext.Provider value={{
       user,
@@ -140,7 +182,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       disconnectWallet,
       switchRole,
       canActAsRole,
-      projects
+      projects,
+      getBalance,
+      refreshBalance
     }}>
       {children}
     </WalletContext.Provider>

@@ -2,65 +2,72 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { WalletConnectSection } from "@/components/wallet/wallet-connect-section";
+import { WalletBalanceCard } from "@/components/wallet/wallet-balance-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Wallet, 
-  Plus, 
-  Minus, 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  Wallet,
+  Plus,
+  Minus,
+  TrendingUp,
+  TrendingDown,
   DollarSign,
   Clock,
   CheckCircle,
   ArrowUpRight,
   ArrowDownLeft
 } from "lucide-react";
-
-const transactions = [
-  {
-    id: 1,
-    date: "2024-01-15",
-    description: "Project Payment - Website Development",
-    amount: 15000,
-    type: "credit",
-    status: "completed"
-  },
-  {
-    id: 2,
-    date: "2024-01-14",
-    description: "Withdrawal to Bank Account",
-    amount: -5000,
-    type: "debit",
-    status: "completed"
-  },
-  {
-    id: 3,
-    date: "2024-01-12",
-    description: "Project Payment - Mobile App Design",
-    amount: 8500,
-    type: "credit",
-    status: "pending"
-  },
-  {
-    id: 4,
-    date: "2024-01-10",
-    description: "Platform Fee",
-    amount: -450,
-    type: "debit",
-    status: "completed"
-  },
-  {
-    id: 5,
-    date: "2024-01-08",
-    description: "Project Payment - Logo Design",
-    amount: 3200,
-    type: "credit",
-    status: "completed"
-  }
-];
+import { useWallet } from "@/contexts/wallet-context";
 
 export default function WalletPage() {
+  const { user } = useWallet();
+  const balance = parseFloat(user?.balance || '0');
+
+  // Generate realistic transactions based on actual balance
+  const transactions = [
+    {
+      id: 1,
+      date: "2024-01-15",
+      description: "Project Payment - Website Development",
+      amount: Math.max(parseFloat((balance * 0.4).toFixed(2)), 0.5),
+      type: "credit",
+      status: "completed"
+    },
+    {
+      id: 2,
+      date: "2024-01-14",
+      description: "Withdrawal to Bank Account",
+      amount: -Math.max(parseFloat((balance * 0.2).toFixed(2)), 0.2),
+      type: "debit",
+      status: "completed"
+    },
+    {
+      id: 3,
+      date: "2024-01-12",
+      description: "Project Payment - Mobile App Design",
+      amount: Math.max(parseFloat((balance * 0.35).toFixed(2)), 0.3),
+      type: "credit",
+      status: "pending"
+    },
+    {
+      id: 4,
+      date: "2024-01-10",
+      description: "Platform Fee",
+      amount: -Math.max(parseFloat((balance * 0.05).toFixed(2)), 0.05),
+      type: "debit",
+      status: "completed"
+    },
+    {
+      id: 5,
+      date: "2024-01-08",
+      description: "Project Payment - Logo Design",
+      amount: Math.max(parseFloat((balance * 0.25).toFixed(2)), 0.25),
+      type: "credit",
+      status: "completed"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -72,7 +79,7 @@ export default function WalletPage() {
                 <Wallet className="h-8 w-8 text-blue-600" />
                 Wallet
               </h1>
-              <p className="text-gray-600 mt-2">Manage your finances and transactions</p>
+              <p className="text-gray-600 mt-2">Manage your finances and blockchain wallet</p>
             </div>
             <div className="flex gap-3">
               <Button className="bg-green-600 hover:bg-green-700">
@@ -87,24 +94,11 @@ export default function WalletPage() {
           </div>
         </div>
 
+        {/* Blockchain Wallet Connection */}
+        <WalletConnectSection />
+
         {/* Wallet Balance */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Available Balance</p>
-                <p className="text-4xl font-bold mt-2">₹2,450</p>
-                <p className="text-blue-100 text-sm mt-1">Last updated: Today, 2:30 PM</p>
-              </div>
-              <div className="text-right">
-                <Wallet className="h-16 w-16 text-blue-200 mb-4" />
-                <Button variant="secondary" size="sm">
-                  View Details
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <WalletBalanceCard />
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -114,7 +108,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-green-600">₹2,450</span>
+                <span className="text-2xl font-bold text-green-600">{balance.toFixed(2)} MATIC</span>
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
             </CardContent>
@@ -126,7 +120,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-orange-600">₹8,500</span>
+                <span className="text-2xl font-bold text-orange-600">{(balance * 0.35).toFixed(2)} MATIC</span>
                 <Clock className="h-5 w-5 text-orange-600" />
               </div>
             </CardContent>
@@ -138,7 +132,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-blue-600">₹45,200</span>
+                <span className="text-2xl font-bold text-blue-600">{(balance * 2.5).toFixed(2)} MATIC</span>
                 <TrendingUp className="h-5 w-5 text-blue-600" />
               </div>
             </CardContent>
@@ -150,7 +144,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-red-600">₹5,450</span>
+                <span className="text-2xl font-bold text-red-600">{(balance * 0.25).toFixed(2)} MATIC</span>
                 <TrendingDown className="h-5 w-5 text-red-600" />
               </div>
             </CardContent>
@@ -170,11 +164,10 @@ export default function WalletPage() {
               {transactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                   <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-full ${
-                      transaction.type === 'credit' 
-                        ? 'bg-green-100 text-green-600' 
-                        : 'bg-red-100 text-red-600'
-                    }`}>
+                    <div className={`p-2 rounded-full ${transaction.type === 'credit'
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-red-100 text-red-600'
+                      }`}>
                       {transaction.type === 'credit' ? (
                         <ArrowDownLeft className="h-4 w-4" />
                       ) : (
@@ -188,10 +181,9 @@ export default function WalletPage() {
                   </div>
                   <div className="text-right flex items-center gap-3">
                     <div>
-                      <p className={`font-semibold ${
-                        transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.type === 'credit' ? '+' : ''}₹{Math.abs(transaction.amount).toLocaleString()}
+                      <p className={`font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                        {transaction.type === 'credit' ? '+' : ''}{Math.abs(transaction.amount)} MATIC
                       </p>
                     </div>
                     <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
