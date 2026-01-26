@@ -44,6 +44,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { FeedbackModal } from "@/components/dashboard/feedback-modal";
 
 interface Milestone {
     title: string;
@@ -134,6 +135,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
     // Agreement Signing State
     const [showSigningModal, setShowSigningModal] = useState(false);
     const [isSigning, setIsSigning] = useState(false);
+
+    // Feedback State
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     const handleRaiseDisputeClick = (index: number | null) => {
         setSelectedDisputeMilestone(index);
@@ -259,6 +263,12 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                 const data = await response.json();
                 showNotification(data.message);
                 fetchContract();
+
+                // Check if this was the last milestone
+                const isLastMilestone = milestoneIndex === (contract?.milestones.length || 0) - 1;
+                if (isLastMilestone) {
+                    setShowFeedbackModal(true);
+                }
             } else {
                 const error = await response.json();
                 showNotification(`Failed: ${error.error}`, 'error');
@@ -948,6 +958,17 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                         </CardContent>
                     </Card>
                 </div>
+            )}
+            {/* Feedback Modal */}
+            {contract && (
+                <FeedbackModal
+                    isOpen={showFeedbackModal}
+                    onClose={() => setShowFeedbackModal(false)}
+                    projectId={contract.project_id}
+                    freelancerId={contract.freelancer_id}
+                    freelancerName={contract.freelancer?.name || 'Freelancer'}
+                    projectTitle={contract.project?.title || 'Project'}
+                />
             )}
         </div >
     );
