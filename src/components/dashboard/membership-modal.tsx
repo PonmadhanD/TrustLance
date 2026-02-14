@@ -137,3 +137,4 @@ export function MembershipModal({ isOpen, onClose }: MembershipModalProps) {
         </Dialog>
     );
 }
+ 

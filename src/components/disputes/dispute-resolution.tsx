@@ -359,4 +359,4 @@ export function DisputeResolution({ disputeId, projectId }: DisputeResolutionPro
       )}
     </div>
   );
-}
+} 

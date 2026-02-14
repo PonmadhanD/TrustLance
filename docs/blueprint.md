@@ -17,4 +17,4 @@
 - Body and headline font: 'Inter' sans-serif for a modern, neutral, readable style. Code font: 'Source Code Pro' for displaying wallet connect code.
 - Desktop-first, fully responsive layout that adapts seamlessly to different screen sizes.
 - Use clear, consistent icons to represent various skills, categories, and functionalities.
-- Subtle hover effects and transitions to enhance user interaction and provide visual feedback.
+- Subtle hover effects and transitions to enhance user interaction and provide visual feedback. 

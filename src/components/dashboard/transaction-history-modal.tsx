@@ -168,3 +168,4 @@ export function TransactionHistoryModal({ isOpen, onClose }: TransactionHistoryM
         </Dialog>
     );
 }
+ 

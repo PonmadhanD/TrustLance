@@ -11,4 +11,4 @@ export default function AuthLayout({
       <main className="min-h-screen">{children}</main>
     </>
   );
-}
+} 

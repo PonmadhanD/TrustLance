@@ -8,3 +8,4 @@ export default function EditProfileLayout({
     // No header or footer for edit profile page
     return <>{children}</>;
 }
+ 

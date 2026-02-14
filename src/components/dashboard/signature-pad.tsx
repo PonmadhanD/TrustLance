@@ -63,3 +63,4 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
         </div>
     );
 }
+ 

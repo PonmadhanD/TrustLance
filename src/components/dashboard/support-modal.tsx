@@ -132,3 +132,4 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
         </Dialog>
     );
 }
+ 

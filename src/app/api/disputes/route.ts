@@ -138,4 +138,4 @@ export async function POST(request: NextRequest) {
     console.error('Create dispute error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
+} 

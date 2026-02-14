@@ -98,3 +98,4 @@ export function WalletBalanceCard() {
         </Card>
     );
 }
+ 

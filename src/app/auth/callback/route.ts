@@ -154,3 +154,4 @@ export async function GET(request: NextRequest) {
     console.log('No code or error in callback - redirecting to login');
     return NextResponse.redirect(new URL('/login', requestUrl.origin));
 }
+ 

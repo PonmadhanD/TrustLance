@@ -314,4 +314,4 @@ export function ProjectLifecycle({ projectId, paymentMethod }: ProjectLifecycleP
       </Card>
     </div>
   );
-}
+} 

@@ -189,3 +189,4 @@ export function FinancialDashboardModal({ isOpen, onClose }: FinancialDashboardM
         </Dialog>
     );
 }
+ 

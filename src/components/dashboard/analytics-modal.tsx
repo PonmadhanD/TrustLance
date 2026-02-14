@@ -184,3 +184,4 @@ export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
         </Dialog>
     );
 }
+ 

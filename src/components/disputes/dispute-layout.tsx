@@ -27,4 +27,4 @@ export function DisputeLayout({ children, backUrl, backLabel }: DisputeLayoutPro
       </footer>
     </div>
   );
-}
+} 

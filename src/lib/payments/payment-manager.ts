@@ -251,4 +251,4 @@ export class PaymentManager {
     const provider = this.getProvider(method);
     return provider.getProjectStatus(projectId);
   }
-}
+} 

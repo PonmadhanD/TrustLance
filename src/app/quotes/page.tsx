@@ -220,4 +220,4 @@ export default function QuotesPage() {
       </div>
     </div>
   );
-}
+} 

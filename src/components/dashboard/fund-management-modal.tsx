@@ -131,3 +131,4 @@ export function FundManagementModal({ isOpen, onClose, type }: FundManagementMod
         </Dialog>
     );
 }
+ 

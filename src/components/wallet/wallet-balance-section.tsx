@@ -113,3 +113,4 @@ export function WalletBalanceSection({ balance, inrValue, loading, onRefresh }: 
         </div>
     );
 }
+ 

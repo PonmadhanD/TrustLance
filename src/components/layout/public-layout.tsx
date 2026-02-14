@@ -13,4 +13,4 @@ export default function PublicLayout({
       <Footer className="" />
     </>
   );
-}
+} 

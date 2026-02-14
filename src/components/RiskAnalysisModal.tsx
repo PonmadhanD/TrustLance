@@ -206,3 +206,4 @@ export function RiskAnalysisModal({ isOpen, onClose, onProceed, report, isLoadin
         </Dialog>
     );
 }
+ 

@@ -139,3 +139,4 @@ export function EducationList({ userId }: { userId: string }) {
         </Card>
     );
 }
+ 

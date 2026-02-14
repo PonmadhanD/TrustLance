@@ -59,3 +59,4 @@ contract TrustToken {
         _mint(to, amount);
     }
 }
+ 

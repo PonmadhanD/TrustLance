@@ -21,4 +21,4 @@ export default async function ProfilePage() {
     // Fallback if username is missing (sidebar/layout might handle this, or force setup)
     redirect("/profile/edit");
   }
-}
+} 

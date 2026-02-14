@@ -119,4 +119,4 @@ export function WalletConnect() {
       </CardContent>
     </Card>
   );
-}
+} 

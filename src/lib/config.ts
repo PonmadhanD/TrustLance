@@ -5,3 +5,4 @@ export const CONFIG = {
     NETWORK_ID: '8118',
     NETWORK_NAME: 'Shardeum',
 };
+ 

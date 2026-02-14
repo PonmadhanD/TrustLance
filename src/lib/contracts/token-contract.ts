@@ -89,3 +89,4 @@ export class TokenContract {
 }
 
 export const tokenContract = new TokenContract();
+ 

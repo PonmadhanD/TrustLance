@@ -42,3 +42,4 @@ contract TrustToken {
         return true;
     }
 }
+ 

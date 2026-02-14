@@ -256,4 +256,4 @@ export default function NewQuotePage() {
       </div>
     </div>
   );
-}
+} 

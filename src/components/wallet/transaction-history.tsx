@@ -92,3 +92,4 @@ export function TransactionHistory({ transactions, loading }: TransactionHistory
         </Card>
     );
 }
+ 

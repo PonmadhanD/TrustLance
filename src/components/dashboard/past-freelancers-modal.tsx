@@ -210,3 +210,4 @@ export function PastFreelancersModal({ isOpen, onClose }: PastFreelancersModalPr
         </Dialog>
     );
 }
+ 

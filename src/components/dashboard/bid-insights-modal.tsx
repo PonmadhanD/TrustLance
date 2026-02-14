@@ -154,3 +154,4 @@ export function BidInsightsModal({ isOpen, onClose }: BidInsightsModalProps) {
         </Dialog>
     );
 }
+ 

@@ -140,3 +140,4 @@ export function getGigSlotsForDate(date: Date): string[] {
 export function formatGigSlot(startHour: number): string {
     return `${startHour.toString().padStart(2, '0')}:00-${(startHour + 1).toString().padStart(2, '0')}:00`;
 }
+ 
