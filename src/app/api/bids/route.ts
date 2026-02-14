@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/notifications';
 
 // POST /api/bids - Submit bid
 export async function POST(request: NextRequest) {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
         // Check if job exists and is open
         const { data: job } = await supabase
             .from('projects')
-            .select('id, status, client_id')
+            .select('id, title, status, client_id')
             .eq('id', job_id)
             .single();
 
@@ -70,7 +71,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        // TODO: Create notification for client
+        // Create notification for client
+        if (job) {
+            await createNotification({
+                userId: job.client_id,
+                title: 'New bid received',
+                message: `${user.user_metadata?.name || user.email} placed a bid of $${amount} on your "${job.title}"`,
+                type: 'proposal',
+                link: `/projects/${job_id}/bids`
+            });
+        }
 
         return NextResponse.json(bid, { status: 201 });
     } catch (error: any) {

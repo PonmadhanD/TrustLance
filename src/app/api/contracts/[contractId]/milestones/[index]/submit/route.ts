@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/notifications';
 
 // POST /api/contracts/[contractId]/milestones/[index]/submit - Submit proof of work
 export async function POST(
@@ -22,7 +23,7 @@ export async function POST(
         // Verify contract and user is freelancer
         const { data: contract } = await supabase
             .from('contracts')
-            .select('*')
+            .select('*, project:projects(title)')
             .eq('id', contractId)
             .single();
 
@@ -49,6 +50,18 @@ export async function POST(
         if (error) {
             console.error('Error submitting milestone:', error);
             return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        // Create notification for client
+        if (contract) {
+            const projectTitle = (contract as any).project?.title || 'project';
+            await createNotification({
+                userId: contract.client_id,
+                title: 'Milestone Submitted',
+                message: `${user.user_metadata?.name || user.email} submitted milestone ${milestoneIndex + 1} for "${projectTitle}"`,
+                type: 'project',
+                link: `/contracts/${contractId}`
+            });
         }
 
         return NextResponse.json(submission);

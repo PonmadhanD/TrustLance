@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, ArrowRight, Check, Upload, X, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Upload, X, Plus, FileText } from 'lucide-react';
 import Logo from '@/components/logo';
 import Link from 'next/link';
+import { AgreementModal } from '@/components/dashboard/agreement-modal';
 
 interface ProjectData {
   title: string;
@@ -24,7 +25,9 @@ interface ProjectData {
   experienceLevel: string;
   skills: string[];
   location: string;
+  location: string;
   visibility: 'public' | 'private';
+  clientSignature?: string;
 }
 
 const categories = {
@@ -74,17 +77,19 @@ export default function PostProjectPage() {
     experienceLevel: '',
     skills: [],
     location: 'anywhere',
-    visibility: 'public'
+    visibility: 'public',
+    clientSignature: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [skillInput, setSkillInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showAgreement, setShowAgreement] = useState(false);
 
   if (!user) {
-    redirect('/login');
+    return null; // Let ConditionalLayout handle the redirect
   }
 
-  const totalSteps = 8;
+  const totalSteps = 9;
 
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
@@ -201,6 +206,8 @@ export default function PostProjectPage() {
           skills: projectData.skills,
           location_preference: projectData.location,
           visibility: projectData.visibility,
+          client_signature: projectData.clientSignature,
+          client_signed_at: new Date().toISOString()
         }),
       });
 
@@ -624,6 +631,67 @@ export default function PostProjectPage() {
         );
 
       case 8:
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Digital Service Agreement</h2>
+              <p className="text-gray-600">Please review and digitally sign the service agreement to proceed.</p>
+            </div>
+
+            <div className="bg-white border rounded-2xl p-6 shadow-sm">
+              {!projectData.clientSignature ? (
+                <div className="text-center py-12 space-y-4">
+                  <div className="h-16 w-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600">
+                    <FileText className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-lg font-bold">Agreement Pending Signature</h3>
+                  <p className="text-sm text-gray-500 max-w-xs mx-auto">You must sign the digital agreement before you can post this project.</p>
+                  <Button
+                    onClick={() => setShowAgreement(true)}
+                    className="bg-blue-600 hover:bg-blue-700 rounded-xl"
+                  >
+                    Open Agreement & Sign
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
+                    <Check className="h-5 w-5 text-green-600" />
+                    <span className="text-sm font-bold text-green-800">Agreement Digitally Signed Successfully</span>
+                    <Button variant="ghost" size="sm" onClick={() => setShowAgreement(true)} className="ml-auto text-xs text-green-700 underline">Update Signature</Button>
+                  </div>
+                  <div className="border rounded-xl p-4 bg-gray-50 flex items-center justify-center h-32">
+                    <img src={projectData.clientSignature} alt="Signature" className="max-h-full object-contain mix-blend-multiply" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <AgreementModal
+              isOpen={showAgreement}
+              onClose={() => setShowAgreement(false)}
+              onSign={(sig) => {
+                setProjectData(prev => ({ ...prev, clientSignature: sig }));
+                setShowAgreement(false);
+              }}
+              userRole="client"
+              data={{
+                clientName: user?.name || 'Authorized Client',
+                clientWallet: (user as any)?.wallet_address || '0x00...000',
+                freelancerName: 'TBD (Awarded Freelancer)',
+                freelancerWallet: 'TBD',
+                projectId: 'PROJ-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                projectTitle: projectData.title,
+                projectDescription: projectData.description,
+                milestones: [
+                  { title: "Initial Project Phase", description: "Based on project requirements", tokens: 100 }
+                ]
+              }}
+            />
+          </div>
+        );
+
+      case 9:
         return (
           <div className="space-y-6">
             <div>

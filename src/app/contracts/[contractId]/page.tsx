@@ -21,13 +21,18 @@ import {
     Send,
     FileText,
     XCircle,
-    Star,
-    MessageSquare,
-    Loader2,
     Flag,
-    AlertTriangle
+    AlertTriangle,
+    ShieldCheck,
+    Download,
+    Star,
+    MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { AgreementModal } from "@/components/dashboard/agreement-modal";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { format } from "date-fns";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -39,6 +44,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { FeedbackModal } from "@/components/dashboard/feedback-modal";
 
 interface Milestone {
     title: string;
@@ -79,19 +85,28 @@ interface Contract {
     project?: {
         title: string;
         description: string;
+        client_signature?: string;
+        created_at?: string;
     };
     client?: {
         id: string; // Ensure ID is available
         name: string;
         username: string;
         rating: number;
+        wallet_address?: string;
     };
     freelancer?: {
         id: string; // Ensure ID is available
         name: string;
         username: string;
         rating: number;
+        wallet_address?: string;
     };
+    freelancer_signature?: string;
+    freelancer_signed_at?: string;
+    client_signature?: string;
+    client_signed_at?: string;
+    agreement_pdf_url?: string;
 }
 
 export default function ContractDetailPage({ params }: { params: Promise<{ contractId: string }> }) {
@@ -120,6 +135,13 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
     const [selectedDisputeMilestone, setSelectedDisputeMilestone] = useState<number | null>(null);
     const [disputeReason, setDisputeReason] = useState("");
     const [disputeDomain, setDisputeDomain] = useState("Web Development");
+
+    // Agreement Signing State
+    const [showSigningModal, setShowSigningModal] = useState(false);
+    const [isSigning, setIsSigning] = useState(false);
+
+    // Feedback State
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     const handleRaiseDisputeClick = (index: number | null) => {
         setSelectedDisputeMilestone(index);
@@ -245,6 +267,12 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                 const data = await response.json();
                 showNotification(data.message);
                 fetchContract();
+
+                // Check if this was the last milestone
+                const isLastMilestone = milestoneIndex === (contract?.milestones.length || 0) - 1;
+                if (isLastMilestone) {
+                    setShowFeedbackModal(true);
+                }
             } else {
                 const error = await response.json();
                 showNotification(`Failed: ${error.error}`, 'error');
@@ -308,6 +336,94 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
             console.error('Error sending message:', error);
             showNotification(`Network Error: ${error.message}`, 'error');
         }
+    };
+
+    const handleFreelancerSign = async (signature: string) => {
+        try {
+            setIsSigning(true);
+            const response = await fetch(`/api/contracts/${contractId}/sign`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ signature })
+            });
+
+            if (response.ok) {
+                showNotification('Agreement Digitally Signed!');
+                setShowSigningModal(false);
+                fetchContract();
+            } else {
+                const error = await response.json();
+                showNotification(`Signing failed: ${error.error}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error signing:', error);
+            showNotification('Failed to sign agreement', 'error');
+        } finally {
+            setIsSigning(false);
+        }
+    };
+
+    const downloadAgreement = () => {
+        if (!contract) return;
+
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Signed Freelance Service Agreement", pageWidth / 2, 20, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Generated on ${format(new Date(), 'PPP')}`, pageWidth / 2, 26, { align: "center" });
+
+        // Parties
+        doc.setFontSize(12);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Project & Parties", 20, 40);
+
+        autoTable(doc, {
+            startY: 45,
+            head: [['Party', 'Name', 'Wallet Address', 'Signed Date']],
+            body: [
+                ['Client', contract.client?.name || 'N/A', contract.client?.wallet_address || 'N/A', contract.project?.created_at ? format(new Date(contract.project.created_at), 'PP') : 'N/A'],
+                ['Freelancer', contract.freelancer?.name || 'N/A', contract.freelancer?.wallet_address || 'N/A', contract.freelancer_signed_at ? format(new Date(contract.freelancer_signed_at), 'PP') : 'Not Signed Yet']
+            ],
+            theme: 'striped',
+            headStyles: { fillColor: [15, 23, 42] }
+        });
+
+        // Project Info
+        const finalY = (doc as any).lastAutoTable.finalY + 15;
+        doc.text("Project Details", 20, finalY);
+        doc.setFontSize(10);
+        doc.text(`Title: ${contract.project?.title}`, 20, finalY + 10);
+        const splitDesc = doc.splitTextToSize(`Description: ${contract.project?.description}`, pageWidth - 40);
+        doc.text(splitDesc, 20, finalY + 17);
+
+        // Milestones
+        const milestoneY = finalY + 25 + (splitDesc.length * 5);
+        doc.text("Milestones", 20, milestoneY);
+        autoTable(doc, {
+            startY: milestoneY + 5,
+            head: [['Milestone', 'Amount']],
+            body: contract.milestones.map((m, i) => [`M${i + 1}: ${m.title}`, `$${m.amount}`]),
+            theme: 'grid'
+        });
+
+        // Signatures
+        const sigY = (doc as any).lastAutoTable.finalY + 20;
+        if (contract.project?.client_signature) {
+            doc.text("Client Signature:", 20, sigY);
+            doc.addImage(contract.project.client_signature, 'PNG', 20, sigY + 5, 40, 20);
+        }
+        if (contract.freelancer_signature) {
+            doc.text("Freelancer Signature:", pageWidth / 2 + 10, sigY);
+            doc.addImage(contract.freelancer_signature, 'PNG', pageWidth / 2 + 10, sigY + 5, 40, 20);
+        }
+
+        doc.save(`Signed-Agreement-${contract.id}.pdf`);
     };
 
     const getMilestoneStatus = (index: number): MilestoneSubmission | null => {
@@ -378,16 +494,39 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
                                 <CardTitle className="text-2xl mb-2">{contract.project?.title}</CardTitle>
-                                <p className="text-gray-600">{contract.project?.description}</p>
+                                <div className="flex items-center gap-4 mt-1">
+                                    <p className="text-gray-600">ID: {contractId.substring(0, 8)}</p>
+                                    {contract.freelancer_signature ? (
+                                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 flex items-center gap-1">
+                                            <ShieldCheck className="h-3 w-3" />
+                                            Contract Signed
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="text-amber-600 border-amber-600 flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            Awaiting Signature
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                className="text-red-600 border-red-600 hover:bg-red-50"
-                                onClick={() => handleRaiseDisputeClick(null)}
-                            >
-                                <AlertTriangle className="h-4 w-4 mr-2" />
-                                Raise Dispute
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={downloadAgreement}
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                                >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Agreement
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="text-red-600 border-red-600 hover:bg-red-50"
+                                    onClick={() => handleRaiseDisputeClick(null)}
+                                >
+                                    <AlertTriangle className="h-4 w-4 mr-2" />
+                                    Raise Dispute
+                                </Button>
+                            </div>
                         </div>
                     </CardHeader>
 
@@ -773,6 +912,69 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                     </div>
                 )
             }
+
+            <AgreementModal
+                isOpen={showSigningModal}
+                onClose={() => setShowSigningModal(false)}
+                onSign={handleFreelancerSign}
+                userRole={isClient ? 'client' : 'freelancer'}
+                data={{
+                    clientName: contract.client?.name || 'Client',
+                    clientWallet: contract.client?.wallet_address || '0x...',
+                    freelancerName: contract.freelancer?.name || 'Freelancer',
+                    freelancerWallet: contract.freelancer?.wallet_address || '0x...',
+                    projectId: contract.id,
+                    projectTitle: contract.project?.title || '',
+                    projectDescription: contract.project?.description || '',
+                    milestones: contract.milestones.map(m => ({
+                        title: m.title,
+                        description: m.description,
+                        tokens: Math.round(m.amount / 10) // 1 Token = ₹10
+                    }))
+                }}
+            />
+
+            {/* Sign Prompt for Freelancer OR Client */}
+            {((isFreelancer && !contract.freelancer_signature) || (isClient && !contract.client_signature)) && (
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <Card className="max-w-md w-full border-none shadow-2xl rounded-[32px] overflow-hidden">
+                        <div className="bg-blue-600 p-8 text-white text-center">
+                            <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
+                                <FileText className="h-8 w-8 text-white" />
+                            </div>
+                            <h2 className="text-2xl font-black mb-2 uppercase tracking-tight">Signature Required</h2>
+                            <p className="text-blue-100 text-sm font-bold">You must sign the Digital Service Agreement before proceeding.</p>
+                        </div>
+                        <CardContent className="p-8 space-y-4">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-slate-600">
+                                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                                    <p className="text-xs font-bold uppercase tracking-widest">Legally Binding</p>
+                                </div>
+                                <p className="text-xs text-slate-500 leading-relaxed">By signing, you agree to the milestone structure, token-based payment model, and intellectual property transfer upon project completion.</p>
+                            </div>
+                            <Button
+                                className="w-full h-12 rounded-2xl bg-slate-900 hover:bg-blue-700 text-white font-black uppercase text-xs tracking-widest shadow-xl transition-all"
+                                onClick={() => setShowSigningModal(true)}
+                                disabled={isSigning}
+                            >
+                                {isSigning ? "Signing..." : "Proceed to Sign"}
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+            {/* Feedback Modal */}
+            {contract && (
+                <FeedbackModal
+                    isOpen={showFeedbackModal}
+                    onClose={() => setShowFeedbackModal(false)}
+                    projectId={contract.project_id}
+                    freelancerId={contract.freelancer_id}
+                    freelancerName={contract.freelancer?.name || 'Freelancer'}
+                    projectTitle={contract.project?.title || 'Project'}
+                />
+            )}
         </div >
     );
 }

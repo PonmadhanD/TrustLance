@@ -24,7 +24,12 @@ import {
   CheckCircle,
   Bot,
   Scale,
-  Clock
+  Clock,
+  Brain,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+  ChevronRight
 } from 'lucide-react';
 import { DisputeLayout } from '@/components/disputes/dispute-layout';
 
@@ -67,6 +72,7 @@ export default function NewDisputePage() {
   });
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [userDecision, setUserDecision] = useState<'accept' | 'appeal' | null>(null);
 
   const totalSteps = 6;
   const progress = (currentStep / totalSteps) * 100;
@@ -86,11 +92,15 @@ export default function NewDisputePage() {
   const runAIAnalysis = async () => {
     setIsAnalyzing(true);
     setTimeout(() => {
+      const isFreelancer = form.role === 'freelancer';
       const analysis = {
-        riskScore: Math.floor(Math.random() * 100),
-        likelyFault: form.role === 'freelancer' ? 'client' : 'freelancer',
-        faultPercentage: Math.floor(Math.random() * 40) + 30,
-        suggestedResolution: 'Partial payment release',
+        riskScore: Math.floor(Math.random() * 30) + 10,
+        likelyFault: isFreelancer ? 'client' : 'freelancer',
+        faultPercentage: 85,
+        explanation: isFreelancer
+          ? "Our AI analyzed the project timeline and communication logs. The freelancer submitted all deliverables 2 days before the deadline. The client viewed the files but did not respond or release the milestone funds for 10 days despite multiple follow-ups."
+          : "Evidence review indicates that the freelancer provided designs missing the requested 'Dark Mode' variation specified in the contract requirements (Section 3.2). This constitutes a breach of the agreed-upon deliverables.",
+        verdict: (isFreelancer ? 'client' : 'freelancer') as 'client' | 'freelancer',
         confidence: 'High',
         similarCases: 15,
         estimatedResolution: '3-5 business days'
@@ -303,14 +313,14 @@ export default function NewDisputePage() {
                 )}
 
                 {aiAnalysis && (
-                  <div className="space-y-4">
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                        <h3 className="font-medium text-green-900">Analysis Complete</h3>
+                  <div className="space-y-6">
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Brain className="h-5 w-5 text-purple-600" />
+                        <h3 className="font-semibold text-purple-900">AI Analysis Summary</h3>
                       </div>
-                      <p className="text-sm text-green-700">
-                        AI has successfully analyzed your case with {aiAnalysis.confidence.toLowerCase()} confidence
+                      <p className="text-sm text-purple-800 leading-relaxed italic">
+                        "{aiAnalysis.explanation}"
                       </p>
                     </div>
 
@@ -359,6 +369,12 @@ export default function NewDisputePage() {
                         <span className="font-medium text-gray-600">Type:</span>
                         <span className="ml-2">{form.disputeType.replace('_', ' ')}</span>
                       </div>
+                      <div className="col-span-2 mt-2 pt-2 border-t">
+                        <span className="font-medium text-gray-600">AI Path Decision:</span>
+                        <Badge variant={userDecision === 'accept' ? 'success' : 'destructive'} className="ml-2">
+                          {userDecision === 'accept' ? 'ACCEPTED AI SOLUTION' : 'APPEALED (ADMIN REVIEW)'}
+                        </Badge>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -397,7 +413,7 @@ export default function NewDisputePage() {
                       (currentStep === 2 && !form.disputeType) ||
                       (currentStep === 3 && (!form.projectId || !form.milestoneId)) ||
                       (currentStep === 4 && !form.description.trim()) ||
-                      (currentStep === 5 && !aiAnalysis)
+                      (currentStep === 5 && (!aiAnalysis || !userDecision))
                     }
                   >
                     Next

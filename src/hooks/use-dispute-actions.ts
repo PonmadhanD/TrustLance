@@ -13,6 +13,9 @@ export interface Dispute {
   createdAt: string;
   paymentMethod: 'BLOCKCHAIN_ESCROW' | 'PAYPAL_PLATFORM_MANAGED';
   outcome?: 'FREELANCER' | 'CLIENT' | 'PARTIAL';
+  aiAnalysisScore?: number;
+  aiExplanation?: string;
+  aiVerdict?: 'FREELANCER' | 'CLIENT' | 'PARTIAL';
 }
 
 export function useDisputeActions() {
@@ -83,7 +86,10 @@ export function useDisputeActions() {
         reason: 'Client not responding to milestone submission',
         createdAt: '2024-01-15',
         paymentMethod: 'PAYPAL_PLATFORM_MANAGED',
-        outcome: 'FREELANCER'
+        outcome: 'FREELANCER',
+        aiAnalysisScore: 94,
+        aiExplanation: "Our AI analyzed the project timeline and communication logs. The freelancer (Ponmadhan) submitted all deliverables 2 days before the deadline. The client (Alex) viewed the files but did not respond or release the milestone funds for 10 days despite multiple follow-ups. All quality criteria for 'Milestone 2' seem to be met according to the project description.",
+        aiVerdict: 'FREELANCER'
       },
       {
         id: 'DSP-002',
@@ -94,7 +100,10 @@ export function useDisputeActions() {
         status: 'AWAITING_EVIDENCE',
         reason: 'Work quality does not match requirements',
         createdAt: '2024-01-12',
-        paymentMethod: 'BLOCKCHAIN_ESCROW'
+        paymentMethod: 'BLOCKCHAIN_ESCROW',
+        aiAnalysisScore: 65,
+        aiExplanation: "Preliminary review indicates that while the freelancer provided designs, they are missing the requested 'Dark Mode' variation specified in the contract requirements (Section 3.2). However, the client provided feedback very late. A partial refund might be warranted if the remaining designs are completed.",
+        aiVerdict: 'PARTIAL'
       }
     ];
   };

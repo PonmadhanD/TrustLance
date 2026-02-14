@@ -22,8 +22,8 @@ export async function GET(
             .select(`
                 *,
                 project:projects(*),
-                client:users!contracts_client_id_fkey(id, name, username, email, rating),
-                freelancer:users!contracts_freelancer_id_fkey(id, name, username, email, rating)
+                client:users!contracts_client_id_fkey(id, name, username, email, rating, wallet_address),
+                freelancer:users!contracts_freelancer_id_fkey(id, name, username, email, rating, wallet_address)
             `)
             .eq('id', contractId)
             .single();

@@ -10,8 +10,10 @@ import {
   DollarSign,
   Calendar,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  MessageCircle
 } from "lucide-react";
+import { useChat } from '@/contexts/chat-context';
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>;
@@ -134,7 +136,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                 <CardTitle className="text-lg">Client</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                     <User className="h-6 w-6 text-gray-600" />
                   </div>
@@ -143,6 +145,18 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                     <p className="text-sm text-gray-600">Project Owner</p>
                   </div>
                 </div>
+                <Button
+                  variant="outline"
+                  className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                  onClick={() => openChat(
+                    project.id,
+                    { id: 'client_1', name: project.client.name, role: 'client', status: 'online' },
+                    project.title
+                  )}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Message Client
+                </Button>
               </CardContent>
             </Card>
 

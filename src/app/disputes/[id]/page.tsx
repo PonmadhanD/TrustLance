@@ -17,9 +17,16 @@ import {
   ExternalLink,
   MessageCircle,
   FileText,
-  Upload
+  Upload,
+  Brain,
+  ThumbsUp,
+  ThumbsDown,
+  Gavel,
+  Check,
+  X as CloseIcon
 } from "lucide-react";
 import { useDisputeActions } from "@/hooks/use-dispute-actions";
+import { useRouter } from "next/navigation";
 
 interface DisputeDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -29,6 +36,7 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
   const { id } = use(params);
   const [showPayPalModal, setShowPayPalModal] = useState(false);
   const [paypalConnected, setPaypalConnected] = useState(false);
+  const [decisionMade, setDecisionMade] = useState(false);
   const { getDisputeById, resolveDispute, releasePayPalPayout, refundPayPalClient } = useDisputeActions();
 
   const dispute = getDisputeById(id);
@@ -59,6 +67,21 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
     } else {
       await refundPayPalClient(dispute.id, 'client@example.com');
     }
+  };
+
+  const handleAcceptAI = async () => {
+    if (!dispute.aiVerdict) return;
+    const success = await resolveDispute(dispute.id, dispute.aiVerdict);
+    if (success) {
+      setDecisionMade(true);
+      // In a real app, this would refresh the data
+    }
+  };
+
+  const handleAppeal = () => {
+    // Escalate to higher level admins
+    console.log(`Escalating dispute ${dispute.id} to human admins`);
+    router.push('/resolution-gigs');
   };
 
   const connectPayPal = () => {
@@ -125,26 +148,27 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
               </CardContent>
             </Card>
 
-            {/* Evidence Timeline */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Evidence Timeline
-                  <Button variant="outline" size="sm">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Evidence
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-4 border rounded-lg">
-                    <FileText className="h-5 w-5 text-blue-600 mt-1" />
-                    <div className="flex-1">
-                      <p className="font-medium">Initial dispute filed</p>
-                      <p className="text-sm text-gray-600">{dispute.reason}</p>
-                      <p className="text-xs text-gray-500 mt-1">{dispute.createdAt}</p>
-                    </div>
+            {/* AI Analysis Section */}
+            {dispute.aiAnalysisScore && (
+              <Card className="border-2 border-purple-100 bg-purple-50/30 overflow-hidden">
+                <CardHeader className="bg-purple-50 border-b border-purple-100">
+                  <CardTitle className="flex items-center gap-2 text-purple-800">
+                    <Brain className="h-5 w-5" />
+                    AI Resolution Analysis
+                    <Badge variant="outline" className="ml-auto bg-white border-purple-200 text-purple-700">
+                      {dispute.aiAnalysisScore}% Confidence
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  <div className="bg-white p-4 rounded-lg border border-purple-100">
+                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-purple-600" />
+                      Analysis Summary
+                    </h4>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {dispute.aiExplanation}
+                    </p>
                   </div>
 
                   {dispute.status === 'UNDER_REVIEW' && (
@@ -156,10 +180,66 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
                         <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
                       </div>
                     </div>
+
+                    <div className={`p-4 rounded-lg border-2 flex items-start gap-3 ${dispute.aiVerdict === 'CLIENT' ? 'bg-green-50 border-green-200' :
+                        dispute.aiVerdict === 'FREELANCER' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
+                      }`}>
+                      <div className={`p-2 rounded-full ${dispute.aiVerdict === 'CLIENT' ? 'bg-green-100' :
+                          dispute.aiVerdict === 'FREELANCER' ? 'bg-red-100' : 'bg-blue-100'
+                        }`}>
+                        {dispute.aiVerdict === 'CLIENT' ? <ThumbsUp className="h-4 w-4 text-green-700" /> : <ThumbsDown className="h-4 w-4 text-red-700" />}
+                      </div>
+                      <div>
+                        <p className={`font-bold text-sm ${dispute.aiVerdict === 'CLIENT' ? 'text-green-800' :
+                            dispute.aiVerdict === 'FREELANCER' ? 'text-red-800' : 'text-blue-800'
+                          }`}>
+                          CLIENT: {dispute.aiVerdict === 'CLIENT' ? 'CORRECT' : 'WRONG'}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {dispute.aiVerdict === 'CLIENT' ? 'Evidence supports a full refund to client.' : 'Evidence suggests unjustified withholding of payment.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {dispute.status !== 'RESOLVED' && !decisionMade && (
+                    <div className="bg-gray-100 p-6 rounded-xl border border-gray-200 text-center">
+                      <h3 className="font-bold text-lg mb-2">Final Decision Required</h3>
+                      <p className="text-sm text-gray-600 mb-6">
+                        Are you accepting this solution recommended by the AI, or do you wish to appeal for human admin review?
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button
+                          className="bg-green-600 hover:bg-green-700 px-8"
+                          onClick={handleAcceptAI}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Accept Solution
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-red-200 text-red-700 hover:bg-red-50 px-8"
+                          onClick={handleAppeal}
+                        >
+                          <Scale className="h-4 w-4 mr-2" />
+                          Appeal (Higher Level)
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-wider">
+                        Note: Appealing will escalate this case to the Resolution Gigs Dashboard for manual review.
+                      </p>
+                    </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
+
+                  {decisionMade && (
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200 flex items-center justify-center gap-3">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <p className="text-green-800 font-medium">Agreement reached. Dispute resolved via AI recommendation.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}

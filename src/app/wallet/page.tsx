@@ -1,6 +1,8 @@
 "use client";
 
+
 import React from "react";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { WalletConnectSection } from "@/components/wallet/wallet-connect-section";
 import { WalletBalanceCard } from "@/components/wallet/wallet-balance-card";
@@ -23,50 +25,48 @@ import { useWallet } from "@/contexts/wallet-context";
 export default function WalletPage() {
   const { user } = useWallet();
   const balance = parseFloat(user?.tokenBalance || user?.balance || '0');
+  const [transactions, setTransactions] = React.useState<any[]>([]);
 
-  // Generate realistic transactions based on actual balance
-  const transactions = [
-    {
-      id: 1,
-      date: "2024-01-15",
-      description: "Project Payment - Website Development",
-      amount: Math.max(parseFloat((balance * 0.4).toFixed(2)), 0.5),
-      type: "credit",
-      status: "completed"
-    },
-    {
-      id: 2,
-      date: "2024-01-14",
-      description: "Withdrawal to Bank Account",
-      amount: -Math.max(parseFloat((balance * 0.2).toFixed(2)), 0.2),
-      type: "debit",
-      status: "completed"
-    },
-    {
-      id: 3,
-      date: "2024-01-12",
-      description: "Project Payment - Mobile App Design",
-      amount: Math.max(parseFloat((balance * 0.35).toFixed(2)), 0.3),
-      type: "credit",
-      status: "pending"
-    },
-    {
-      id: 4,
-      date: "2024-01-10",
-      description: "Platform Fee",
-      amount: -Math.max(parseFloat((balance * 0.05).toFixed(2)), 0.05),
-      type: "debit",
-      status: "completed"
-    },
-    {
-      id: 5,
-      date: "2024-01-08",
-      description: "Project Payment - Logo Design",
-      amount: Math.max(parseFloat((balance * 0.25).toFixed(2)), 0.25),
-      type: "credit",
-      status: "completed"
-    }
-  ];
+  React.useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchTransactions = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (data) {
+        setTransactions(data);
+      }
+    };
+
+    fetchTransactions();
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel('wallet-transactions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'transactions',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload: any) => {
+          setTransactions((prev) => [payload.new, ...prev].slice(0, 5));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -161,42 +161,46 @@ export default function WalletPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-full ${transaction.type === 'credit'
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-red-600'
-                      }`}>
-                      {transaction.type === 'credit' ? (
-                        <ArrowDownLeft className="h-4 w-4" />
-                      ) : (
-                        <ArrowUpRight className="h-4 w-4" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">{transaction.date}</p>
-                    </div>
-                  </div>
-                  <div className="text-right flex items-center gap-3">
-                    <div>
-                      <p className={`font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+              {transactions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No recent transactions</div>
+              ) : (
+                transactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-full ${transaction.type === 'credit'
+                        ? 'bg-green-100 text-green-600'
+                        : 'bg-red-100 text-red-600'
                         }`}>
-                        {transaction.type === 'credit' ? '+' : ''}{Math.abs(transaction.amount)} TRT
-                      </p>
+                        {transaction.type === 'credit' ? (
+                          <ArrowDownLeft className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpRight className="h-4 w-4" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{transaction.description}</p>
+                        <p className="text-sm text-gray-500">{new Date(transaction.created_at).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
-                      {transaction.status === 'completed' ? (
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                      ) : (
-                        <Clock className="h-3 w-3 mr-1" />
-                      )}
-                      {transaction.status}
-                    </Badge>
+                    <div className="text-right flex items-center gap-3">
+                      <div>
+                        <p className={`font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                          {transaction.type === 'credit' ? '+' : '-'}{Math.abs(transaction.amount)} TRT
+                        </p>
+                      </div>
+                      <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
+                        {transaction.status === 'completed' ? (
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                        ) : (
+                          <Clock className="h-3 w-3 mr-1" />
+                        )}
+                        {transaction.status}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

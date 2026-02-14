@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Code, Palette, Smartphone, Globe, Briefcase, PenTool } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -407,6 +408,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose, type }) => {
 };
 
 export default function Header({ className }: { className?: string }) {
+  const router = useRouter();
   const [activeMegaMenu, setActiveMegaMenu] = useState<'hire' | 'work' | 'solutions' | null>(null);
 
   return (

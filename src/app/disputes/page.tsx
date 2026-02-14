@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ import {
 import { useDisputeActions } from "@/hooks/use-dispute-actions";
 
 export default function DisputesPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
   const { getDisputes } = useDisputeActions();
   const disputes = getDisputes();
@@ -65,7 +67,7 @@ export default function DisputesPage() {
             </div>
             <Button
               className="bg-purple-600 hover:bg-purple-700"
-              onClick={() => window.location.href = '/disputes/new'}
+              onClick={() => router.push('/disputes/new')}
             >
               <Plus className="h-4 w-4 mr-2" />
               Raise Dispute
@@ -177,14 +179,14 @@ export default function DisputesPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => window.location.href = `/disputes/${dispute.id}/messages`}
+                            onClick={() => router.push(`/disputes/${dispute.id}/messages`)}
                           >
                             <MessageCircle className="h-4 w-4 mr-2" />
                             Messages
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => window.location.href = `/disputes/${dispute.id}`}
+                            onClick={() => router.push(`/disputes/${dispute.id}`)}
                           >
                             <Eye className="h-4 w-4 mr-2" />
                             View Details

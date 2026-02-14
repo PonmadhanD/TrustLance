@@ -26,6 +26,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   linkWallet: (address: string) => Promise<{ success: boolean; error?: string }>;
+  authChecked: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
 
   // Check auth state on mount
@@ -77,9 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         await loadUserProfile(session.user);
+        setAuthChecked(true);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setIsAuthenticated(false);
+        setAuthChecked(true);
       }
     });
 
@@ -96,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error checking auth:', error);
     } finally {
       setLoading(false);
+      setAuthChecked(true);
     }
   }
 
@@ -123,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           avatar_url: profile.avatar_url
         });
         setIsAuthenticated(true);
+        setAuthChecked(true);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -291,6 +297,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated,
       user,
       loading,
+      authChecked,
       login,
       signup,
       signInWithGoogle,

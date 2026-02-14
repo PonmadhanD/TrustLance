@@ -78,10 +78,10 @@ export async function POST(request: NextRequest) {
                 title,
                 description,
                 client_id,
-                freelancer_id,
+                hired_freelancer_id: freelancer_id,
                 budget,
                 milestones,
-                status: 'ACTIVE'
+                status: 'open'
             })
             .select()
             .single();

@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     "World's largest freelance marketplace. Any job you can possibly think of. Save up to 90% & get quotes for free. Pay only when you're 100% happy.",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{

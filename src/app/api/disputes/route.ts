@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/notifications';
 
 // GET /api/disputes - List disputes
 export async function GET(request: NextRequest) {
@@ -101,6 +102,31 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Create notification for the other party
+    try {
+      const { data: project } = await supabase
+        .from('projects')
+        .select('client_id, hired_freelancer_id, title')
+        .eq('id', project_id)
+        .single();
+
+      if (project) {
+        const otherPartyId = role === 'CLIENT' ? project.hired_freelancer_id : project.client_id;
+        if (otherPartyId) {
+          await createNotification({
+            userId: otherPartyId,
+            title: 'Dispute Raised',
+            message: `A dispute has been raised for the project "${project.title}" by the ${role.toLowerCase()}.`,
+            type: 'dispute',
+            link: `/disputes` // Or a more specific link if available
+          });
+        }
+      }
+    } catch (notifyError) {
+      console.error('Error creating dispute notification:', notifyError);
+      // Don't fail the request if notification fails
     }
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { ethers } from 'ethers';
 import { CONFIG } from '@/lib/config';
 
@@ -49,6 +50,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   ]);
 
+  const router = useRouter();
+  const pathname = usePathname();
+
   const connectWallet = async () => {
     try {
       if (typeof window !== 'undefined' && window.ethereum) {
@@ -79,7 +83,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setUser(userData);
         setIsConnected(true);
 
+        setUser(userData);
+        setIsConnected(true);
+
         localStorage.setItem('walletAddress', walletAddress);
+
+        // Auto-redirect to dashboard if on public pages
+        if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
+          router.push('/dashboard');
+        }
       } else {
         // Fallback for demo - simulate wallet connection
         const mockWallet = '0x742d35Cc6634C0532925a3b8D404fddF4f780EAD';
@@ -91,8 +103,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         };
 
         setUser(userData);
+        setUser(userData);
         setIsConnected(true);
         localStorage.setItem('walletAddress', mockWallet);
+
+        // Auto-redirect to dashboard if on public pages
+        if (pathname === '/' || pathname === '/login' || pathname === '/signup') {
+          router.push('/dashboard');
+        }
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);

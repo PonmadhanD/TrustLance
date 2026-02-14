@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS projects (
   visibility TEXT DEFAULT 'public' CHECK (visibility IN ('public', 'private')),
   status TEXT DEFAULT 'open' CHECK (status IN ('draft', 'open', 'in_progress', 'completed', 'cancelled')),
   hired_freelancer_id UUID REFERENCES users(id),
+  client_signature TEXT,
+  client_signed_at TIMESTAMPTZ,
   time_remaining TEXT,
   tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -329,6 +331,9 @@ CREATE TABLE IF NOT EXISTS contracts (
   milestones JSONB DEFAULT '[]',
   smart_contract_address TEXT,
   chain_id INTEGER,
+  freelancer_signature TEXT,
+  freelancer_signed_at TIMESTAMPTZ,
+  agreement_pdf_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(project_id)

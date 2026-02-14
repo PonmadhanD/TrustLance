@@ -13,7 +13,7 @@ export default function ConditionalLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading, authChecked } = useAuth(); // Get loading and authChecked state
   const router = useRouter();
 
   const isAuthPage = ["/login", "/signup", "/post-project"].includes(pathname);
@@ -42,19 +42,68 @@ export default function ConditionalLayout({
     "/find-jobs",
     "/escrow",
     "/resolution-gigs",
-    "/contracts"
+    "/contracts",
+    "/notifications",
+    "/contests",
+    "/freelancers",
+    "/freemarket",
+    "/verified",
+    "/preferred",
+    "/memberships",
+    "/exams",
+    "/recruiter",
+    "/technical-copilot",
+    "/enterprise",
+    "/local-jobs",
+    "/showcase",
+    "/community",
+    "/discover",
+    "/support",
+    "/search",
+    "/settings",
+    "/post-project"
   ].some(route => pathname.startsWith(route));
 
   useEffect(() => {
+    if (!authChecked) return; // Wait until auth status is known
+
     if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
-      router.push("/dashboard");
+      router.replace("/dashboard");
+      return;
     }
     if (!isAuthenticated && isAuthenticatedRoute) {
-      router.push("/login");
+      router.replace("/login");
     }
-  }, [isAuthenticated, pathname, router, isAuthenticatedRoute]);
+  }, [isAuthenticated, authChecked, pathname, router, isAuthenticatedRoute]);
 
-  // Auth pages (login, signup, post-project) - no header/footer
+  // While we don't know the auth state, show a spinner to avoid FOUC
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Handle protected routes while unauthenticated (waiting for redirect in useEffect)
+  if (isAuthenticatedRoute && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Handle login/signup while authenticated (waiting for redirect in useEffect)
+  if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Auth pages (login, signup, post-project) - no global header/footer
   if (isAuthPage) {
     return <>{children}</>;
   }
@@ -64,6 +113,6 @@ export default function ConditionalLayout({
     return <AuthLayout>{children}</AuthLayout>;
   }
 
-  // Public routes - use PublicLayout
+  // Public routes or fallback
   return <PublicLayout>{children}</PublicLayout>;
 }

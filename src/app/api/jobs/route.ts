@@ -78,7 +78,9 @@ export async function POST(request: NextRequest) {
             experience_level,
             skills,
             location_preference,
-            visibility
+            visibility,
+            client_signature,
+            client_signed_at
         } = body;
 
         // Validate required fields
@@ -107,6 +109,8 @@ export async function POST(request: NextRequest) {
                 location_preference,
                 visibility: visibility || 'public',
                 client_id: user.id,
+                client_signature,
+                client_signed_at,
                 status: 'open'
             })
             .select()

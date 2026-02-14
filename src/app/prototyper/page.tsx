@@ -31,11 +31,11 @@ export default function PrototyperPage() {
   const [currentPath, setCurrentPath] = useState<Path | null>(null);
   const [selectedTool, setSelectedTool] = useState<'cursor' | 'pen'>('cursor');
   const [showMinimap, setShowMinimap] = useState(false);
-  
+
   const canvasRef = useRef<HTMLDivElement>(null);
 
   if (!user) {
-    redirect('/login');
+    return null; // Let ConditionalLayout handle the redirect
   }
 
   const initializeCanvas = () => {
@@ -44,11 +44,11 @@ export default function PrototyperPage() {
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!canvasRef.current) return;
-    
+
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left - pan.x) / zoom;
     const y = (e.clientY - rect.top - pan.y) / zoom;
-    
+
     setCursors(prev => [
       ...prev.filter(c => c.id !== user.id),
       { id: user.id, username: user.username, x, y, color: '#3b82f6' }
@@ -66,10 +66,10 @@ export default function PrototyperPage() {
     if (selectedTool === 'pen') {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
-      
+
       const x = (e.clientX - rect.left - pan.x) / zoom;
       const y = (e.clientY - rect.top - pan.y) / zoom;
-      
+
       const newPath: Path = {
         id: Date.now().toString(),
         points: [{ x, y }],
@@ -77,7 +77,7 @@ export default function PrototyperPage() {
         userId: user.id,
         type: 'solid'
       };
-      
+
       setCurrentPath(newPath);
       setIsDrawing(true);
     }
@@ -104,7 +104,7 @@ export default function PrototyperPage() {
 
   const pathToSVG = (path: Path) => {
     if (path.points.length < 2) return '';
-    
+
     let d = `M ${path.points[0].x} ${path.points[0].y}`;
     for (let i = 1; i < path.points.length; i++) {
       const prev = path.points[i - 1];
@@ -113,7 +113,7 @@ export default function PrototyperPage() {
       const cpy = (prev.y + curr.y) / 2;
       d += ` Q ${prev.x} ${prev.y} ${cpx} ${cpy}`;
     }
-    
+
     return d;
   };
 
