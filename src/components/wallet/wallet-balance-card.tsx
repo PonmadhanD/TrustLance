@@ -5,11 +5,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wallet, RefreshCw } from 'lucide-react';
 import { useWallet } from '@/contexts/wallet-context';
+import { CONFIG } from '@/lib/config';
 
 export function WalletBalanceCard() {
-    const { user, isConnected, refreshBalance } = useWallet();
+    const { user, isConnected, isSyncing, networkError, currentChainId, refreshBalance, switchNetwork } = useWallet();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+    const isWrongNetwork = isConnected && currentChainId && currentChainId !== CONFIG.NETWORK_ID;
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -38,23 +41,29 @@ export function WalletBalanceCard() {
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-blue-100 text-sm font-medium">Blockchain Wallet Balance</p>
-                        {isConnected && user?.balance ? (
+                        {isConnected && (user?.balance || isSyncing) ? (
                             <>
                                 <div className="flex items-baseline gap-2">
-                                    <p className="text-4xl font-bold mt-2">{user?.tokenBalance ? parseFloat(user.tokenBalance).toFixed(4) : '0.0000'} TRT</p>
+                                    <p className="text-4xl font-bold mt-2">
+                                        {isSyncing ? '...' : (user?.balance || '0.0000')} SHM
+                                    </p>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={handleRefresh}
-                                        disabled={isRefreshing}
+                                        disabled={isRefreshing || isSyncing}
                                         className="text-white hover:text-blue-100 hover:bg-blue-600/50"
                                     >
-                                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                        <RefreshCw className={`h-4 w-4 ${(isRefreshing || isSyncing) ? 'animate-spin' : ''}`} />
                                     </Button>
                                 </div>
-                                <p className="text-blue-100 text-sm mt-1">
-                                    Last updated: Today, {formatTime(lastUpdated)}
-                                </p>
+                                {networkError ? (
+                                    <p className="text-red-200 text-xs mt-1 font-medium">{networkError}</p>
+                                ) : (
+                                    <p className="text-blue-100 text-sm mt-1">
+                                        {isSyncing ? 'Syncing with Shardeum...' : `Last updated: Today, ${formatTime(lastUpdated)}`}
+                                    </p>
+                                )}
                             </>
                         ) : (
                             <>
@@ -65,12 +74,22 @@ export function WalletBalanceCard() {
                             </>
                         )}
                     </div>
-                    <div className="text-right">
-                        <Wallet className="h-16 w-16 text-blue-200 mb-4" />
+                    <div className="text-right flex flex-col items-end">
+                        <Wallet className="h-10 w-10 text-blue-200 mb-2" />
                         {isConnected && (
                             <div className="text-sm text-blue-100">
-                                <p>Network: Sepolia</p>
-                                <p className="text-xs mt-1">Custom Token (TRT)</p>
+                                <p className="font-bold">Network: {CONFIG.NETWORK_NAME}</p>
+                                {isWrongNetwork && (
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="mt-2 h-8 text-xs bg-red-500 hover:bg-red-600 border-none animate-pulse"
+                                        onClick={switchNetwork}
+                                    >
+                                        Switch to Shardeum
+                                    </Button>
+                                )}
+                                <p className="text-xs mt-1">Chain ID: {currentChainId || '...'}</p>
                             </div>
                         )}
                     </div>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CreditCard, 
+import {
+  CreditCard,
   ArrowLeft,
   Shield,
   CheckCircle,
@@ -14,20 +15,21 @@ import {
 } from "lucide-react";
 
 export default function PayPalConnectPage() {
+  const router = useRouter();
   const [connecting, setConnecting] = useState(false);
   const [connected, setConnected] = useState(false);
 
   const handlePayPalConnect = async () => {
     setConnecting(true);
-    
+
     // Simulate PayPal OAuth flow
     setTimeout(() => {
       setConnected(true);
       setConnecting(false);
-      
+
       // Redirect back to payments page with success
       setTimeout(() => {
-        window.location.href = '/profile/payments?status=success';
+        router.push('/profile/payments?status=success');
       }, 2000);
     }, 2000);
   };
@@ -37,15 +39,15 @@ export default function PayPalConnectPage() {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="mb-4"
-            onClick={() => window.location.href = '/profile/payments'}
+            onClick={() => router.push('/profile/payments')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Payments
           </Button>
-          
+
           <h1 className="text-3xl font-bold text-gray-900">Connect Your PayPal Account</h1>
           <p className="text-gray-600 mt-2">
             Securely connect PayPal to receive milestone payments, refunds, and dispute resolutions
@@ -91,13 +93,13 @@ export default function PayPalConnectPage() {
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                       <CreditCard className="h-10 w-10 text-blue-600" />
                     </div>
-                    
+
                     <h3 className="text-xl font-semibold mb-4">PayPal Integration</h3>
                     <p className="text-gray-600 text-sm mb-6">
                       Click below to securely authorize our platform to send you payments
                     </p>
-                    
-                    <Button 
+
+                    <Button
                       className="w-full bg-blue-600 hover:bg-blue-700"
                       onClick={handlePayPalConnect}
                       disabled={connecting}
@@ -120,12 +122,12 @@ export default function PayPalConnectPage() {
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                       <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
-                    
+
                     <h3 className="text-xl font-semibold mb-4 text-green-700">Successfully Connected!</h3>
                     <p className="text-gray-600 text-sm mb-6">
                       Your PayPal account is now connected. Redirecting you back...
                     </p>
-                    
+
                     <Badge className="bg-green-100 text-green-800">
                       <CheckCircle className="h-3 w-3 mr-1" />
                       Connected
@@ -154,7 +156,7 @@ export default function PayPalConnectPage() {
                       <p className="text-gray-600">We use PayPal's official OAuth flow</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
                     <div>
@@ -162,7 +164,7 @@ export default function PayPalConnectPage() {
                       <p className="text-gray-600">We never access your PayPal password</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
                     <div>
@@ -171,7 +173,7 @@ export default function PayPalConnectPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />

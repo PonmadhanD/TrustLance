@@ -4,7 +4,7 @@ You're almost ready! Follow these steps:
 
 ## ✅ What You've Done
 - [x] Created Supabase project: **freelance-escrow-demo**
-- [x] Got Polygon Amoy testnet tokens
+- [x] Got Shardeum SHM testnet tokens
 - [x] Have backend code ready
 
 ## 📋 Next Steps
@@ -46,10 +46,10 @@ PLATFORM_ADMIN_ADDRESS=0x... # your wallet address (copy from MetaMask)
 ### 4. Deploy Smart Contract (After backend npm install finishes)
 
 ```bash
-npm run deploy:amoy
+# Deployed on Shardeum
 ```
 
-**Note:** Use `deploy:amoy` (not mumbai) - Amoy is the new testnet!
+**Note:** Shardeum network settings are available in the Wallet section of the app.
 
 ### 5. Add Contract Address
 

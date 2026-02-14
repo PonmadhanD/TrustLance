@@ -24,7 +24,7 @@ import { useWallet } from "@/contexts/wallet-context";
 
 export default function WalletPage() {
   const { user } = useWallet();
-  const balance = parseFloat(user?.tokenBalance || user?.balance || '0');
+  const balance = parseFloat(user?.balance || '0');
   const [transactions, setTransactions] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -108,7 +108,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-green-600">{user?.tokenBalance ? parseFloat(user.tokenBalance).toFixed(2) : '0.00'} TRT</span>
+                <span className="text-2xl font-bold text-green-600">{user?.balance || '0.00'} SHM</span>
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
             </CardContent>
@@ -120,7 +120,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-orange-600">{(balance * 0.35).toFixed(2)} TRT</span>
+                <span className="text-2xl font-bold text-orange-600">{(balance * 0.35).toFixed(2)} SHM</span>
                 <Clock className="h-5 w-5 text-orange-600" />
               </div>
             </CardContent>
@@ -132,7 +132,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-blue-600">{(balance * 2.5).toFixed(2)} TRT</span>
+                <span className="text-2xl font-bold text-blue-600">{(balance * 2.5).toFixed(2)} SHM</span>
                 <TrendingUp className="h-5 w-5 text-blue-600" />
               </div>
             </CardContent>
@@ -144,7 +144,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-red-600">{(balance * 0.25).toFixed(2)} TRT</span>
+                <span className="text-2xl font-bold text-red-600">{(balance * 0.25).toFixed(2)} SHM</span>
                 <TrendingDown className="h-5 w-5 text-red-600" />
               </div>
             </CardContent>
@@ -186,7 +186,7 @@ export default function WalletPage() {
                       <div>
                         <p className={`font-semibold ${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
                           }`}>
-                          {transaction.type === 'credit' ? '+' : '-'}{Math.abs(transaction.amount)} TRT
+                          {transaction.type === 'credit' ? '+' : '-'}{Math.abs(transaction.amount)} SHM
                         </p>
                       </div>
                       <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>

@@ -65,7 +65,7 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
 
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139); // slate-500
-        doc.text("(Smart Contract & Token-Based Payment)", pageWidth / 2, 26, { align: "center" });
+        doc.text("(Smart Contract & SHM-Based Payment)", pageWidth / 2, 26, { align: "center" });
 
         // Table of Parties
         doc.setFontSize(12);
@@ -102,7 +102,7 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
 
         autoTable(doc, {
             startY: milestoneY + 5,
-            head: [['Milestone', 'Description', 'Tokens']],
+            head: [['Milestone', 'Description', 'SHM Amount']],
             body: data.milestones.map((m, i) => [`M${i + 1}: ${m.title}`, m.description, m.tokens]),
             theme: 'grid',
             headStyles: { fillColor: [37, 99, 235] } // blue-600
@@ -188,8 +188,8 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
                                 </section>
 
                                 <section>
-                                    <h4 className="font-black text-slate-900 uppercase mb-2">2. Token-Based Payment</h4>
-                                    <p>Payments are made using platform tokens (1 Token = ₹10). Tokens are locked in a smart contract and released only on milestone approval. The platform does not hold real money during execution.</p>
+                                    <h4 className="font-black text-slate-900 uppercase mb-2">2. SHM-Based Payment</h4>
+                                    <p>Payments are made using SHM tokens. SHM is locked in a smart contract and released only on milestone approval.</p>
                                 </section>
 
                                 <section>
@@ -204,7 +204,7 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
                                                     <div className="font-bold text-slate-800 truncate">{m.title}</div>
                                                     <div className="text-[10px] text-slate-500 line-clamp-1">{m.description}</div>
                                                 </div>
-                                                <div className="font-black text-blue-700 whitespace-nowrap">{m.tokens} TRT</div>
+                                                <div className="font-black text-blue-700 whitespace-nowrap">{m.tokens} SHM</div>
                                             </div>
                                         ))}
                                     </div>

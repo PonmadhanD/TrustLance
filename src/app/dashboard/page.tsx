@@ -101,44 +101,46 @@ export default function DashboardPage() {
         </div>
 
         {/* Wallet & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="md:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+          <div className="md:col-span-2 h-full">
             <WalletWidget />
           </div>
-          <Card>
 
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Available Projects</p>
-                <p className="text-2xl font-bold text-blue-600">{jobs.length}</p>
+          <Card className="h-full bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
+            <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+              <div className="bg-blue-50 p-2 rounded-lg mb-3">
+                <Briefcase className="h-5 w-5 text-blue-600" />
               </div>
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Projects</p>
+              <p className="text-2xl font-black text-slate-900 leading-none">{jobs.length}</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">New This Week</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {jobs.filter(j => {
-                    const weekAgo = new Date();
-                    weekAgo.setDate(weekAgo.getDate() - 7);
-                    return new Date(j.created_at) > weekAgo;
-                  }).length}
-                </p>
+
+          <Card className="h-full bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
+            <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+              <div className="bg-green-50 p-2 rounded-lg mb-3">
+                <TrendingUp className="h-5 w-5 text-green-600" />
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">New</p>
+              <p className="text-2xl font-black text-slate-900 leading-none">
+                {jobs.filter(j => {
+                  const weekAgo = new Date();
+                  weekAgo.setDate(weekAgo.getDate() - 7);
+                  return new Date(j.created_at) > weekAgo;
+                }).length}
+              </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Clients</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  {new Set(jobs.map(j => j.client_id)).size}
-                </p>
+
+          <Card className="h-full bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
+            <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+              <div className="bg-purple-50 p-2 rounded-lg mb-3">
+                <Users className="h-5 w-5 text-purple-600" />
               </div>
-              <Users className="h-8 w-8 text-purple-600" />
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Clients</p>
+              <p className="text-2xl font-black text-slate-900 leading-none">
+                {new Set(jobs.map(j => j.client_id)).size}
+              </p>
             </CardContent>
           </Card>
         </div>

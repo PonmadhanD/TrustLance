@@ -98,7 +98,6 @@ const secondaryNavItems = [
   { name: "Feedback", href: "/feedback", icon: <Star className="h-4 w-4" /> },
   { name: "Project Updates", href: "/project-updates", icon: <Activity className="h-4 w-4" /> },
   { name: "Bookmarks", href: "/bookmarks", icon: <Bookmark className="h-4 w-4" /> },
-  { name: "Prototyper", href: "/prototyper", icon: <Zap className="h-4 w-4" />, isNew: true },
   { name: "Disputes & Resolutions", href: "/disputes", icon: <Scale className="h-4 w-4" /> }
 ];
 
@@ -847,7 +846,7 @@ export default function AuthenticatedHeader() {
                 <div className="flex items-center space-x-2 text-sm cursor-pointer">
                   <Wallet className="h-4 w-4 text-green-400" />
                   <span className="text-green-400 font-medium">
-                    {walletUser?.tokenBalance ? `${parseFloat(walletUser.tokenBalance).toFixed(2)} TRT` : (walletUser?.balance ? `${walletUser.balance} ETH` : '₹0')}
+                    {walletUser?.balance ? `${walletUser.balance} SHM` : '₹0'}
                   </span>
                 </div>
               </Link>
@@ -1121,9 +1120,6 @@ export default function AuthenticatedHeader() {
                 >
                   {item.icon}
                   {item.name}
-                  {item.isNew && (
-                    <Badge className="bg-orange-500 text-xs px-1 py-0">NEW</Badge>
-                  )}
                 </Button>
               </Link>
             ))}

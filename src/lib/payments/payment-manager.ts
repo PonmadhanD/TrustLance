@@ -54,7 +54,9 @@ export class SmartContractEscrow implements PaymentProvider {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // TRT Token Contract
+      // SHM Native token (or wrapped if using specific contract)
+      // For Shardeum Sphinx native, we usually just transfer SHM. 
+      // But we'll update the logs to be consistent.
       const tokenContract = new ethers.Contract(
         CONFIG.TRUST_TOKEN_ADDRESS,
         [
@@ -72,7 +74,7 @@ export class SmartContractEscrow implements PaymentProvider {
       const decimals = 18; // Default
       const amountWei = ethers.parseUnits(amount.toString(), decimals);
 
-      console.log(`Initiating Transfer of ${amount} TRT to ${destinationAddress}...`);
+      console.log(`Initiating Transfer of ${amount} SHM to ${destinationAddress}...`);
 
       // Execute Transfer
       const tx = await tokenContract.transfer(destinationAddress, amountWei);

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CreditCard, 
-  CheckCircle, 
+import {
+  CreditCard,
+  CheckCircle,
   AlertCircle,
   ExternalLink,
   Info,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function ProfilePaymentsPage() {
+  const router = useRouter();
   const [paypalConnected, setPaypalConnected] = useState(false);
   const [paypalEmail, setPaypalEmail] = useState("john.doe@example.com");
 
@@ -22,15 +24,15 @@ export default function ProfilePaymentsPage() {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className="mb-4"
-            onClick={() => window.location.href = '/profile'}
+            onClick={() => router.push('/profile')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Profile
           </Button>
-          
+
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <CreditCard className="h-8 w-8 text-green-600" />
             Payments & Payouts
@@ -91,17 +93,17 @@ export default function ProfilePaymentsPage() {
                     )}
                   </Badge>
                   {paypalConnected ? (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => setPaypalConnected(false)}
                     >
                       Disconnect
                     </Button>
                   ) : (
-                    <Button 
+                    <Button
                       size="sm"
-                      onClick={() => window.location.href = '/profile/payments/paypal'}
+                      onClick={() => router.push('/profile/payments/paypal')}
                     >
                       Connect PayPal
                     </Button>
@@ -133,14 +135,14 @@ export default function ProfilePaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Button 
+              <Button
                 className="w-full justify-between"
-                onClick={() => window.location.href = '/profile/payments/paypal'}
+                onClick={() => router.push('/profile/payments/paypal')}
               >
                 <span>Manage PayPal Account</span>
                 <ExternalLink className="h-4 w-4" />
               </Button>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium text-gray-700 mb-2">What PayPal is used for:</h4>
                 <ul className="text-sm text-gray-600 space-y-1">

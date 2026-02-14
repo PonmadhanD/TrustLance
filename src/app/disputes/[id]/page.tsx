@@ -33,6 +33,7 @@ interface DisputeDetailsPageProps {
 }
 
 export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) {
+  const router = useRouter();
   const { id } = use(params);
   const [showPayPalModal, setShowPayPalModal] = useState(false);
   const [paypalConnected, setPaypalConnected] = useState(false);
@@ -85,7 +86,7 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
   };
 
   const connectPayPal = () => {
-    window.location.href = `/profile/payments/paypal?redirect=/disputes/${dispute.id}`;
+    router.push(`/profile/payments/paypal?redirect=/disputes/${dispute.id}`);
   };
 
   return (
@@ -96,7 +97,7 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
           <Button
             variant="ghost"
             className="mb-4"
-            onClick={() => window.location.href = '/disputes'}
+            onClick={() => router.push('/disputes')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Disputes
@@ -172,26 +173,48 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
                   </div>
 
                   {dispute.status === 'UNDER_REVIEW' && (
-                    <div className="flex items-start gap-4 p-4 border rounded-lg bg-blue-50">
+                    <div className="flex items-start gap-4 p-4 border rounded-lg bg-blue-50 mb-6">
                       <MessageCircle className="h-5 w-5 text-blue-600 mt-1" />
                       <div className="flex-1">
                         <p className="font-medium">AI Analysis Complete</p>
                         <p className="text-sm text-gray-600">Evidence reviewed, recommendation generated</p>
-                        <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Deterministic Verdict Boxes */}
+                    <div className={`p-4 rounded-lg border-2 flex items-start gap-3 ${dispute.aiVerdict === 'FREELANCER' ? 'bg-green-50 border-green-200' :
+                      dispute.aiVerdict === 'CLIENT' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
+                      }`}>
+                      <div className={`p-2 rounded-full ${dispute.aiVerdict === 'FREELANCER' ? 'bg-green-100' :
+                        dispute.aiVerdict === 'CLIENT' ? 'bg-red-100' : 'bg-blue-100'
+                        }`}>
+                        {dispute.aiVerdict === 'FREELANCER' ? <ThumbsUp className="h-4 w-4 text-green-700" /> : <ThumbsDown className="h-4 w-4 text-red-700" />}
+                      </div>
+                      <div>
+                        <p className={`font-bold text-sm ${dispute.aiVerdict === 'FREELANCER' ? 'text-green-800' :
+                          dispute.aiVerdict === 'CLIENT' ? 'text-red-800' : 'text-blue-800'
+                          }`}>
+                          FREELANCER: {dispute.aiVerdict === 'FREELANCER' ? 'CORRECT' : 'WRONG'}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {dispute.aiVerdict === 'FREELANCER' ? 'Evidence supports full release of funds.' : 'Evidence suggests non-compliance with requirements.'}
+                        </p>
                       </div>
                     </div>
 
                     <div className={`p-4 rounded-lg border-2 flex items-start gap-3 ${dispute.aiVerdict === 'CLIENT' ? 'bg-green-50 border-green-200' :
-                        dispute.aiVerdict === 'FREELANCER' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
+                      dispute.aiVerdict === 'FREELANCER' ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'
                       }`}>
                       <div className={`p-2 rounded-full ${dispute.aiVerdict === 'CLIENT' ? 'bg-green-100' :
-                          dispute.aiVerdict === 'FREELANCER' ? 'bg-red-100' : 'bg-blue-100'
+                        dispute.aiVerdict === 'FREELANCER' ? 'bg-red-100' : 'bg-blue-100'
                         }`}>
                         {dispute.aiVerdict === 'CLIENT' ? <ThumbsUp className="h-4 w-4 text-green-700" /> : <ThumbsDown className="h-4 w-4 text-red-700" />}
                       </div>
                       <div>
                         <p className={`font-bold text-sm ${dispute.aiVerdict === 'CLIENT' ? 'text-green-800' :
-                            dispute.aiVerdict === 'FREELANCER' ? 'text-red-800' : 'text-blue-800'
+                          dispute.aiVerdict === 'FREELANCER' ? 'text-red-800' : 'text-blue-800'
                           }`}>
                           CLIENT: {dispute.aiVerdict === 'CLIENT' ? 'CORRECT' : 'WRONG'}
                         </p>
@@ -381,7 +404,7 @@ export default function DisputeDetailsPage({ params }: DisputeDetailsPageProps) 
             </div>
           </DialogContent>
         </Dialog>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ interface ProjectWorkspacePageProps {
 
 export default function ProjectWorkspacePage({ params }: ProjectWorkspacePageProps) {
   const { id } = use(params);
+  const router = useRouter();
   const [project, setProject] = useState<ProjectData | null>(null);
   const [userRole, setUserRole] = useState<'CLIENT' | 'FREELANCER' | null>(null);
   const [deliverables, setDeliverables] = useState("");
@@ -53,7 +55,7 @@ export default function ProjectWorkspacePage({ params }: ProjectWorkspacePagePro
       setUserRole('FREELANCER');
     } else {
       // Unauthorized access - redirect to dashboard
-      window.location.href = '/dashboard';
+      router.push('/dashboard');
     }
   }, []);
 
@@ -147,7 +149,7 @@ export default function ProjectWorkspacePage({ params }: ProjectWorkspacePagePro
           <Button
             variant="ghost"
             className="mb-4"
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => router.push('/dashboard')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
@@ -494,7 +496,7 @@ export default function ProjectWorkspacePage({ params }: ProjectWorkspacePagePro
                   </div>
 
                   <Button
-                    onClick={() => window.location.href = `/disputes/DSP-${project.id}`}
+                    onClick={() => router.push(`/disputes/DSP-${project.id}`)}
                     variant="outline"
                     className="w-full"
                   >

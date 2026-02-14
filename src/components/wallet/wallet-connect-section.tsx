@@ -109,10 +109,10 @@ export function WalletConnectSection() {
                                     <CheckCircle className="h-5 w-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-gray-900">Wallet Connected (Sepolia TRT)</p>
+                                    <p className="font-semibold text-gray-900">Wallet Connected (Shardeum SHM)</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <code className="text-sm font-mono text-gray-700">
-                                            {walletUser?.tokenBalance ? `${parseFloat(walletUser.tokenBalance).toFixed(4)} TRT` : 'Loading...'}
+                                            {walletUser?.balance ? `${walletUser.balance} SHM` : 'Loading...'}
                                         </code>
                                         <span className="text-gray-400">|</span>
                                         <code className="text-xs text-gray-500">
@@ -125,7 +125,7 @@ export function WalletConnectSection() {
                                             variant="ghost"
                                             size="sm"
                                             className="h-6 w-6 p-0"
-                                            onClick={() => window.open(`https://polygonscan.com/address/${walletUser?.walletAddress}`, '_blank')}
+                                            onClick={() => window.open(`https://explorer-sphinx.shardeum.org/account/${walletUser?.walletAddress}`, '_blank')}
                                         >
                                             <ExternalLink className="h-3 w-3" />
                                         </Button>
@@ -190,6 +190,29 @@ export function WalletConnectSection() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Shardeum Network Settings (Helpful for users) */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="text-sm font-bold text-blue-900 mb-2">Shardeum Network Settings</h4>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <p className="text-blue-600 font-medium">Network Name</p>
+                                    <p className="text-blue-900 font-bold">Shardeum</p>
+                                </div>
+                                <div>
+                                    <p className="text-blue-600 font-medium">RPC URL</p>
+                                    <p className="text-blue-900 font-bold">api.shardeum.org</p>
+                                </div>
+                                <div>
+                                    <p className="text-blue-600 font-medium">Chain ID</p>
+                                    <p className="text-blue-900 font-bold">8118</p>
+                                </div>
+                                <div>
+                                    <p className="text-blue-600 font-medium">Currency Symbol</p>
+                                    <p className="text-blue-900 font-bold">SHM</p>
+                                </div>
+                            </div>
+                        </div>
 
                         {/* Security Notice */}
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">

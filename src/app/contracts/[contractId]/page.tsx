@@ -131,10 +131,10 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
     const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
     // Dispute State
-    const [disputeOpen, setDisputeOpen] = useState(false);
-    const [selectedDisputeMilestone, setSelectedDisputeMilestone] = useState<number | null>(null);
-    const [disputeReason, setDisputeReason] = useState("");
-    const [disputeDomain, setDisputeDomain] = useState("Web Development");
+    // const [disputeOpen, setDisputeOpen] = useState(false); // Removed for direct routing
+    // const [selectedDisputeMilestone, setSelectedDisputeMilestone] = useState<number | null>(null); // Removed
+    // const [disputeReason, setDisputeReason] = useState(""); // Removed
+    // const [disputeDomain, setDisputeDomain] = useState("Web Development"); // Removed
 
     // Agreement Signing State
     const [showSigningModal, setShowSigningModal] = useState(false);
@@ -144,10 +144,13 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     const handleRaiseDisputeClick = (index: number | null) => {
-        setSelectedDisputeMilestone(index);
-        setDisputeOpen(true);
+        // Redirect to the dedicated Dispute Creation Page
+        // Pass projectId if available to potentially pre-fill (needs support in destination)
+        const query = contract?.project_id ? `?projectId=${contract.project_id}` : '';
+        router.push(`/disputes/new${query}`);
     };
 
+    /*
     const submitDispute = async () => {
         try {
             // Default to milestone 0 if none selected (e.g. from header button)
@@ -181,6 +184,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
             setSubmitting(null);
         }
     };
+    */
 
     useEffect(() => {
         if (notification) {
@@ -530,62 +534,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                         </div>
                     </CardHeader>
 
-                    {/* Dispute Dialog */}
-                    <AlertDialog open={disputeOpen} onOpenChange={setDisputeOpen}>
-                        <AlertDialogContent className="max-w-md">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle className="flex items-center gap-2 text-red-600">
-                                    <AlertTriangle className="h-5 w-5" />
-                                    Raise a Dispute
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    An arbitrator will be assigned to review this milestone. Please provide details.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-
-                            <div className="grid gap-4 py-4">
-                                <div className="grid gap-2">
-                                    <Label>Milestone</Label>
-                                    <Input disabled value={selectedDisputeMilestone !== null ? contract?.milestones[selectedDisputeMilestone]?.description : 'General Contract Dispute'} />
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label>Domain / Category</Label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                        value={disputeDomain}
-                                        onChange={(e) => setDisputeDomain(e.target.value)}
-                                    >
-                                        <option value="Web Development">Web Development</option>
-                                        <option value="Mobile App">Mobile App</option>
-                                        <option value="Design">Design & Creative</option>
-                                        <option value="Writing">Writing & Translation</option>
-                                    </select>
-                                </div>
-
-                                <div className="grid gap-2">
-                                    <Label>Reason for Dispute</Label>
-                                    <Textarea
-                                        placeholder="Describe the issue clearly..."
-                                        value={disputeReason}
-                                        onChange={(e) => setDisputeReason(e.target.value)}
-                                        rows={4}
-                                    />
-                                </div>
-                            </div>
-
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={(e) => { e.preventDefault(); submitDispute(); }}
-                                    className="bg-red-600 hover:bg-red-700"
-                                    disabled={!disputeReason.trim()}
-                                >
-                                    Raise Dispute
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    {/* Dispute Dialog Removed - Redirects to /disputes/new now */}
 
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -11,8 +11,8 @@ interface User {
   defaultRole: 'CLIENT' | 'FREELANCER';
   email?: string;
   name?: string;
-  balance?: string; // ETH Balance
-  tokenBalance?: string; // TRT Balance
+  balance?: string; // SHM Balance (Native)
+  tokenBalance?: string; // TRT Balance (Legacy/Optional)
 }
 
 interface Project {
@@ -26,8 +26,12 @@ interface Project {
 interface WalletContextType {
   user: User | null;
   isConnected: boolean;
+  isSyncing: boolean;
+  networkError: string | null;
+  currentChainId: string | null;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
+  switchNetwork: () => Promise<void>;
   switchRole: (projectId: string, role: 'CLIENT' | 'FREELANCER') => boolean;
   canActAsRole: (projectId: string, role: 'CLIENT' | 'FREELANCER') => boolean;
   projects: Project[];
@@ -40,6 +44,9 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [networkError, setNetworkError] = useState<string | null>(null);
+  const [currentChainId, setCurrentChainId] = useState<string | null>(null);
   const [projects] = useState<Project[]>([
     {
       id: '1',
@@ -52,6 +59,44 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const router = useRouter();
   const pathname = usePathname();
+
+  const switchNetwork = async () => {
+    if (typeof window === 'undefined' || !window.ethereum) return;
+
+    const chainIdHex = `0x${parseInt(CONFIG.NETWORK_ID).toString(16)}`;
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainIdHex }],
+      });
+    } catch (switchError: any) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: CONFIG.NETWORK_NAME,
+                nativeCurrency: {
+                  name: 'Shardeum',
+                  symbol: 'SHM',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://api.shardeum.org'],
+                blockExplorerUrls: ['https://explorer-sphinx.shardeum.org/'],
+              },
+            ],
+          });
+        } catch (addError) {
+          console.error('Error adding Shardeum network:', addError);
+        }
+      }
+      console.error('Error switching to Shardeum network:', switchError);
+    }
+  };
 
   const connectWallet = async () => {
     try {
@@ -144,50 +189,70 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const getTokenBalance = async (): Promise<string> => {
     if (!user?.walletAddress || typeof window === 'undefined' || !window.ethereum) return '0.0';
 
+    // Skip if address is not set or seems like a placeholder for Shardeum
+    if (!CONFIG.TRUST_TOKEN_ADDRESS || CONFIG.TRUST_TOKEN_ADDRESS === '0x0000000000000000000000000000000000000000') {
+      return '0.0';
+    }
+
     try {
-      // Use ethers v6 BrowserProvider
       const provider = new ethers.BrowserProvider(window.ethereum);
 
-      // Minimal ABI for balanceOf
       const abi = [
         "function balanceOf(address owner) view returns (uint256)"
       ];
 
       const contract = new ethers.Contract(CONFIG.TRUST_TOKEN_ADDRESS, abi, provider);
-      const balanceWei = await contract.balanceOf(user.walletAddress);
-      return ethers.formatUnits(balanceWei, 18); // Assuming 18 decimals
+
+      // Use a timeout or catch specific CALL_EXCEPTION
+      const balanceWei = await contract.balanceOf(user.walletAddress).catch(() => null);
+
+      if (balanceWei === null) return '0.0';
+
+      return ethers.formatUnits(balanceWei, 18);
     } catch (error) {
-      console.error('Error fetching token balance:', error);
+      // Silently handle RPC/Contract errors to avoid console noise
       return '0.0';
     }
   };
 
   const getBalance = async (): Promise<string> => {
-    if (!user?.walletAddress) return '0.0';
+    if (!user?.walletAddress || typeof window === 'undefined' || !window.ethereum) return '0.0';
 
     try {
-      if (typeof window !== 'undefined' && window.ethereum) {
-        const balanceWei = await window.ethereum.request({
-          method: 'eth_getBalance',
-          params: [user.walletAddress, 'latest']
-        });
-        const balanceEth = parseInt(balanceWei, 16) / 1e18;
-        return balanceEth.toFixed(4);
-      }
-      return '0.0';
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const balanceWei = await provider.getBalance(user.walletAddress).catch(() => null);
+
+      if (balanceWei === null) return '0.0';
+
+      const balanceEth = ethers.formatUnits(balanceWei, 18);
+      return parseFloat(balanceEth).toFixed(4);
     } catch (error) {
-      console.error('Error fetching balance:', error);
+      // Silently handle RPC errors
       return '0.0';
     }
   };
 
   const refreshBalance = async () => {
-    if (user) {
-      const [balance, tokenBalance] = await Promise.all([
-        getBalance(),
-        getTokenBalance()
-      ]);
-      setUser({ ...user, balance, tokenBalance });
+    if (user && !isSyncing) {
+      setIsSyncing(true);
+      setNetworkError(null);
+      try {
+        const [balance, tokenBalance] = await Promise.all([
+          getBalance(),
+          getTokenBalance()
+        ]);
+        // For Shardeum, native balance (SHM) is what we primarily care about.
+        // We'll map 'balance' to SHM.
+        setUser({ ...user, balance, tokenBalance });
+      } catch (err: any) {
+        if (err.code === -32002) {
+          setNetworkError("RPC Rate Limited - retrying...");
+        } else {
+          setNetworkError("Network sync error");
+        }
+      } finally {
+        setIsSyncing(false);
+      }
     }
   };
 
@@ -210,10 +275,34 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Auto-refresh balance when connected
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      const eth = window.ethereum;
+      eth.request({ method: 'eth_chainId' }).then((id: string) => {
+        setCurrentChainId(parseInt(id, 16).toString());
+      });
+
+      const handleChainChanged = (id: string) => {
+        const newId = parseInt(id, 16).toString();
+        setCurrentChainId(newId);
+        console.log(`Chain changed to: ${newId}. Refreshing balance...`);
+        refreshBalance();
+      };
+
+      eth.on('chainChanged', handleChainChanged);
+      return () => {
+        if (eth.removeListener) {
+          eth.removeListener('chainChanged', handleChainChanged);
+        }
+      };
+    }
+  }, []);
+
+  // Auto-refresh balance when connected
+  useEffect(() => {
     if (isConnected && user) {
       refreshBalance();
-      // Refresh balance every 15 seconds
-      const interval = setInterval(refreshBalance, 15000);
+      // Refresh balance every 30 seconds
+      const interval = setInterval(refreshBalance, 30000);
       return () => clearInterval(interval);
     }
   }, [isConnected, user?.walletAddress]);
@@ -222,8 +311,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     <WalletContext.Provider value={{
       user,
       isConnected,
+      isSyncing,
+      networkError,
+      currentChainId,
       connectWallet,
       disconnectWallet,
+      switchNetwork,
       switchRole,
       canActAsRole,
       projects,

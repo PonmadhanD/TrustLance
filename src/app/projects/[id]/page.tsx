@@ -47,7 +47,11 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     // Simulate project creation process
     setTimeout(() => {
       // Redirect to workspace
+<<<<<<< Updated upstream
       window.location.href = `/projects/${id}/workspace`;
+=======
+      router.push(`/projects/${params.id}/workspace`);
+>>>>>>> Stashed changes
     }, 2000);
   };
 

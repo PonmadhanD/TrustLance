@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,6 +51,7 @@ const clientDisputeTypes = [
   { value: 'refund_not_processed', label: 'Refund not processed' }
 ];
 
+<<<<<<< Updated upstream
 interface AiAnalysis {
   riskScore: number;
   likelyFault: string;
@@ -58,19 +61,114 @@ interface AiAnalysis {
   similarCases: number;
   estimatedResolution: string;
 }
+=======
+const MOCK_PROJECTS = [
+  {
+    id: 'mock-1',
+    title: 'E-commerce Platform Development',
+    status: 'active',
+    project_id: 'proj-1',
+    projects: { title: 'E-commerce Platform Development' },
+    milestones: [
+      { title: 'Frontend Design', amount: 1500, description: 'UI/UX Implementation' },
+      { title: 'Backend API', amount: 2000, description: 'Server and Database Setup' },
+      { title: 'Payment Integration', amount: 500, description: 'Stripe Connect' }
+    ]
+  },
+  {
+    id: 'mock-2',
+    title: 'Mobile App Redesign',
+    status: 'disputed',
+    project_id: 'proj-2',
+    projects: { title: 'Mobile App Redesign' },
+    milestones: [
+      { title: 'Wireframes', amount: 800, description: 'Initial layouts' },
+      { title: 'High Fidelity Prototyping', amount: 1200, description: 'Figma prototypes' }
+    ]
+  }
+];
+>>>>>>> Stashed changes
 
 export default function NewDisputePage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const initialProjectId = searchParams.get('projectId');
+
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+
   const [form, setForm] = useState({
     role: '',
     disputeType: '',
-    projectId: '',
+    projectId: initialProjectId || '',
     milestoneId: '',
     description: '',
     attachments: []
   });
+<<<<<<< Updated upstream
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
+=======
+
+  // Fetch projects on mount
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchProjects = async () => {
+      setIsLoadingProjects(true);
+      const supabase = createClient();
+
+      // Fetch contracts where user is client OR freelancer
+      const { data, error } = await supabase
+        .from('contracts')
+        .select(`
+                  id,
+                  project_id,
+                  client_id,
+                  freelancer_id,
+                  milestones,
+                  projects (
+                      title
+                  )
+              `)
+        .or(`client_id.eq.${user.id},freelancer_id.eq.${user.id}`);
+
+      if (error) {
+        console.error('Error fetching projects:', JSON.stringify(error, null, 2));
+        setProjects(MOCK_PROJECTS); // Fallback to mock on error
+      } else {
+        const fetchedData = data || [];
+        // Combine fetched data with mock data so user always sees examples
+        setProjects([...fetchedData, ...MOCK_PROJECTS]);
+
+        // Auto-select role based on contract if project pre-selected
+        if (initialProjectId && data) {
+          const preSelected = data.find(p => p.project_id === initialProjectId || p.id === initialProjectId); // handle both IDs just in case
+          if (preSelected) {
+            if (preSelected.client_id === user.id) setForm(prev => ({ ...prev, role: 'client' }));
+            else if (preSelected.freelancer_id === user.id) setForm(prev => ({ ...prev, role: 'freelancer' }));
+          }
+        }
+      }
+      setIsLoadingProjects(false);
+    };
+
+    fetchProjects();
+  }, [user, initialProjectId]);
+
+  // Get milestones for selected project
+  const selectedProject = projects.find(p => p.id === form.projectId || p.project_id === form.projectId);
+  const projectMilestones = selectedProject?.milestones || [];
+  const [aiAnalysis, setAiAnalysis] = useState<{
+    riskScore: number;
+    likelyFault: string;
+    faultPercentage: number;
+    explanation: string;
+    verdict: 'freelancer' | 'client' | 'partial';
+    confidence: string;
+  } | null>(null);
+>>>>>>> Stashed changes
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userDecision, setUserDecision] = useState<'accept' | 'appeal' | null>(null);
 
@@ -214,15 +312,25 @@ export default function NewDisputePage() {
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="project">Project</Label>
-                    <Select value={form.projectId} onValueChange={(value) => setForm(prev => ({ ...prev, projectId: value }))}>
+                    <Label htmlFor="project">Project / Contract</Label>
+                    <Select value={form.projectId} onValueChange={(value) => setForm(prev => ({ ...prev, projectId: value, milestoneId: '' }))}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a project" />
+                        <SelectValue placeholder={isLoadingProjects ? "Loading projects..." : "Select a project"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">E-commerce Website Development - $2500</SelectItem>
-                        <SelectItem value="2">Mobile App UI Design - $1800</SelectItem>
-                        <SelectItem value="3">Logo Design Project - $500</SelectItem>
+                        {projects.map((contract) => {
+                          const projData = contract.projects;
+                          const projectTitle = Array.isArray(projData) ? projData[0]?.title : projData?.title;
+                          return (
+                            <SelectItem key={contract.id} value={contract.id}>
+                              {projectTitle || 'Untitled Contract'}
+                              <span className="text-xs text-gray-500 ml-2">({contract.status || 'Active'})</span>
+                            </SelectItem>
+                          );
+                        })}
+                        {projects.length === 0 && !isLoadingProjects && (
+                          <SelectItem value="none" disabled>No active contracts found</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -235,9 +343,14 @@ export default function NewDisputePage() {
                           <SelectValue placeholder="Select a milestone" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1">Initial Design Mockups - $500</SelectItem>
-                          <SelectItem value="2">Frontend Development - $1000</SelectItem>
-                          <SelectItem value="3">Backend Integration - $1000</SelectItem>
+                          {projectMilestones.map((milestone: any, index: number) => (
+                            <SelectItem key={index} value={index.toString()}>
+                              {milestone.description || milestone.title || `Milestone ${index + 1}`} - ${milestone.amount}
+                            </SelectItem>
+                          ))}
+                          {projectMilestones.length === 0 && (
+                            <SelectItem value="none" disabled>No milestones found</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -371,7 +484,7 @@ export default function NewDisputePage() {
                       </div>
                       <div className="col-span-2 mt-2 pt-2 border-t">
                         <span className="font-medium text-gray-600">AI Path Decision:</span>
-                        <Badge variant={userDecision === 'accept' ? 'success' : 'destructive'} className="ml-2">
+                        <Badge variant={userDecision === 'accept' ? 'default' : 'destructive'} className={`ml-2 ${userDecision === 'accept' ? 'bg-green-600 hover:bg-green-700' : ''}`}>
                           {userDecision === 'accept' ? 'ACCEPTED AI SOLUTION' : 'APPEALED (ADMIN REVIEW)'}
                         </Badge>
                       </div>
@@ -427,8 +540,8 @@ export default function NewDisputePage() {
               </div>
             </div>
           </CardContent>
-        </Card>
-      </div>
-    </DisputeLayout>
+        </Card >
+      </div >
+    </DisputeLayout >
   );
 }

@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Search, 
-  Filter, 
-  Clock, 
-  Users, 
+import {
+  Search,
+  Filter,
+  Clock,
+  Users,
   DollarSign,
   Briefcase,
   ChevronDown
@@ -16,7 +17,7 @@ import {
 
 const categories = [
   "All Categories",
-  "Web Development", 
+  "Web Development",
   "Mobile Apps",
   "Design",
   "Writing",
@@ -71,6 +72,7 @@ const projects = [
 ];
 
 export default function ProjectsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedType, setSelectedType] = useState("All Types");
@@ -81,12 +83,12 @@ export default function ProjectsPage() {
 
   const filteredProjects = projects.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "All Categories" || 
-                           project.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase()));
+      project.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All Categories" ||
+      project.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase()));
     const matchesType = selectedType === "All Types" || project.budget.type === selectedType;
     const matchesLevel = selectedLevel === "All Levels" || project.experienceLevel === selectedLevel;
-    
+
     return matchesSearch && matchesCategory && matchesType && matchesLevel;
   });
 
@@ -110,7 +112,7 @@ export default function ProjectsPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Filters</h3>
-                
+
                 {/* Search */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
@@ -213,9 +215,9 @@ export default function ProjectsPage() {
               <div className="text-center py-20">
                 <Briefcase className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No projects available at the moment</h3>
-                <Button 
+                <Button
                   className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => window.location.href = '/post-project'}
+                  onClick={() => router.push('/post-project')}
                 >
                   Post a Project
                 </Button>
@@ -227,14 +229,14 @@ export default function ProjectsPage() {
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <button 
+                          <button
                             className="text-xl font-semibold text-blue-600 hover:text-blue-800 text-left mb-2"
-                            onClick={() => window.location.href = `/projects/${project.id}`}
+                            onClick={() => router.push(`/projects/${project.id}`)}
                           >
                             {project.title}
                           </button>
                           <p className="text-gray-700 mb-4 leading-relaxed">{project.description}</p>
-                          
+
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.skills.map((skill) => (
                               <Badge key={skill} variant="secondary" className="text-xs">
@@ -242,7 +244,7 @@ export default function ProjectsPage() {
                               </Badge>
                             ))}
                           </div>
-                          
+
                           <div className="flex items-center gap-6 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                               <DollarSign className="h-4 w-4" />
@@ -265,9 +267,9 @@ export default function ProjectsPage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="ml-6">
-                          <Button 
+                          <Button
                             className="bg-blue-600 hover:bg-blue-700"
                             onClick={() => handleBidNow(project.id)}
                           >
