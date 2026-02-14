@@ -43,10 +43,10 @@ export function LockTokensModal({
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Lock className="w-5 h-5 text-amber-500" />
-                        Lock Tokens in Escrow
+                        Lock SHM in Escrow
                     </DialogTitle>
                     <DialogDescription>
-                        You are about to lock tokens in a smart contract for this job.
+                        You are about to lock SHM in a smart contract for this job.
                         These funds will be held securely until you release them.
                     </DialogDescription>
                 </DialogHeader>
@@ -70,10 +70,10 @@ export function LockTokensModal({
 
                     <div className="space-y-3">
                         <div className="flex justify-between items-center px-1">
-                            <span className="text-sm text-slate-600">Lock Amount</span>
+                            <span className="text-sm text-slate-600">Lock Amount (SHM)</span>
                             <TokenAmount amount={amount} size="lg" status="locked" />
                         </div>
-
+                        Broadway
                         <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-slate-100"></div>
@@ -97,7 +97,7 @@ export function LockTokensModal({
                     <div className="bg-amber-50 p-3 rounded-md flex gap-2 items-start text-xs text-amber-800 border border-amber-100">
                         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                         <p>
-                            Tokens will be deducted from your wallet immediately but will remain yours in the contract until you approve the work.
+                            SHM will be deducted from your wallet immediately but will remain yours in the contract until you approve the work.
                         </p>
                     </div>
                 </div>
@@ -110,7 +110,7 @@ export function LockTokensModal({
                         {isLoading ? "Processing..." : (
                             <>
                                 <Lock className="w-4 h-4" />
-                                Confirm & Lock Tokens
+                                Confirm & Lock SHM
                             </>
                         )}
                     </Button>

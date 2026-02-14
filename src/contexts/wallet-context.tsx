@@ -14,7 +14,6 @@ interface User {
   balance?: string; // SHM Balance (Available)
   lockedBalance?: string; // SHM Locked in Escrow
   totalBalance?: string; // Total SHM (Available + Locked)
-  tokenBalance?: string; // TRT Balance (Legacy/Optional)
 }
 
 interface Project {
@@ -128,8 +127,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           name: 'John Doe',
           balance: '0.0',
           lockedBalance: '0.0',
-          totalBalance: '0.0',
-          tokenBalance: '0.0'
+          totalBalance: '0.0'
         };
 
         setUser(userData);
@@ -151,8 +149,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           name: 'Demo User',
           balance: '0.0',
           lockedBalance: '0.0',
-          totalBalance: '0.0',
-          tokenBalance: '0.0'
+          totalBalance: '0.0'
         };
 
         setUser(userData);
@@ -193,17 +190,18 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return canActAsRole(projectId, role);
   };
 
-  const getTokenBalance = async (): Promise<string> => {
-    // Deprecated or optional TRT token balance
-    return '0.0';
-  };
+  // getTrtBalance removed - using native SHM
 
   const getLockedBalance = async (): Promise<string> => {
-    if (!user?.walletAddress) return '0.0';
-    // TODO: Implement actual contract call
-    // For now, return a mock value if we have a user
-    // In a real implementation this would call contract.getLockedBalance(user.walletAddress)
-    return '250.0';
+    if (!user?.walletAddress || typeof window === 'undefined' || !window.ethereum) return '0.0';
+
+    try {
+      // For now, this is a mock since we don't have a view function in Escrow.sol yet for global user locks
+      // In a real scenario, you'd add a "totalLocked(address)" function to Escrow.sol
+      return '0.0';
+    } catch (error) {
+      return '0.0';
+    }
   };
 
   const getBalance = async (): Promise<string> => {
@@ -237,7 +235,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const balanceNum = parseFloat(balance) || 0;
         const lockedNum = parseFloat(locked) || 0;
         const total = (balanceNum + lockedNum).toFixed(4);
-
         setUser({ ...user, balance, lockedBalance: locked, totalBalance: total });
       } catch (err: any) {
         if (err.code === -32002) {
@@ -262,8 +259,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         name: 'Demo User',
         balance: '0.0',
         lockedBalance: '0.0',
-        totalBalance: '0.0',
-        tokenBalance: '0.0'
+        totalBalance: '0.0'
       };
       setUser(userData);
       setIsConnected(true);

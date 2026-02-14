@@ -18,6 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ethers } from 'ethers';
+import { CONFIG } from '@/lib/config';
 
 interface ProjectData {
   title: string;
@@ -93,6 +95,8 @@ export default function PostProjectPage() {
   const [skillInput, setSkillInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
+  const [blockchainStep, setBlockchainStep] = useState<'idle' | 'approving' | 'locking' | 'success' | 'error'>('idle');
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   if (!user) {
     return null; // Let ConditionalLayout handle the redirect
@@ -173,9 +177,54 @@ export default function PostProjectPage() {
   const submitProject = async () => {
     try {
       setLoading(true);
+      setBlockchainStep('idle');
 
       const budgetValue = parseFloat(projectData.budgetAmount);
+      const budgetWei = ethers.parseUnits(projectData.budgetAmount, 18);
+      const tempProjectId = `PROJ_${Math.random().toString(36).substring(7).toUpperCase()}`;
 
+      // 0. CONFIG VALIDATION
+      if (CONFIG.TRUST_TOKEN_ADDRESS.toLowerCase() === CONFIG.ESCROW_CONTRACT_ADDRESS.toLowerCase()) {
+        setBlockchainStep('error');
+        throw new Error("Misconfiguration: TrustToken and Escrow contract addresses cannot be the same. Please deploy the Escrow contract and update your config.");
+      }
+
+      // 1. BLOCKCHAIN VALIDATION
+      if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error("MetaMask is not installed. Please install it to post projects.");
+      }
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const network = await provider.getNetwork();
+
+      if (network.chainId.toString() !== CONFIG.NETWORK_ID) {
+        setBlockchainStep('error');
+        alert(`Please switch your network to ${CONFIG.NETWORK_NAME} (Chain ID: ${CONFIG.NETWORK_ID})`);
+        return;
+      }
+
+      const signer = await provider.getSigner();
+
+      // 2. LOCK FUNDS IN ESCROW (Native SHM)
+      setBlockchainStep('locking');
+      const escrowAbi = ["function lockFunds(string memory projectId) public payable"];
+      const escrowContract = new ethers.Contract(CONFIG.ESCROW_CONTRACT_ADDRESS, escrowAbi, signer);
+
+      try {
+        const lockTx = await escrowContract.lockFunds(tempProjectId, {
+          value: budgetWei
+        });
+        console.log("Lock TX:", lockTx.hash);
+        setTxHash(lockTx.hash);
+        await lockTx.wait();
+      } catch (err: any) {
+        console.error("Locking failed:", err);
+        throw new Error(`Locking SHM in escrow failed: ${err.reason || err.message}`);
+      }
+
+      setBlockchainStep('success');
+
+      // 4. SAVE TO DATABASE
       const response = await fetch('/api/jobs', {
         method: 'POST',
         headers: {
@@ -198,14 +247,17 @@ export default function PostProjectPage() {
           location_preference: projectData.location,
           visibility: projectData.visibility,
           client_signature: projectData.clientSignature,
-          client_signed_at: new Date().toISOString()
+          client_signed_at: new Date().toISOString(),
+          blockchain_tx: txHash,
+          escrow_locked: true,
+          temp_id: tempProjectId
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
-        throw new Error(errorData.error || 'Failed to create project');
+        throw new Error(errorData.error || 'Failed to sync project to server after blockchain success.');
       }
 
       const data = await response.json();
@@ -214,6 +266,7 @@ export default function PostProjectPage() {
       router.push('/my-projects?posted=true');
     } catch (error: any) {
       console.error('Error creating project:', error);
+      setBlockchainStep('error');
       alert(`Failed to create project: ${error.message}`);
     } finally {
       setLoading(false);
@@ -834,10 +887,13 @@ export default function PostProjectPage() {
                         <Button variant="outline" disabled={loading}>Save as Draft</Button>
                         <Button
                           onClick={submitProject}
-                          className="bg-blue-600 hover:bg-blue-700"
+                          className="bg-blue-600 hover:bg-blue-700 min-w-[140px]"
                           disabled={loading}
                         >
-                          {loading ? 'Posting...' : 'Post Project'}
+                          {blockchainStep === 'locking' && 'Locking SHM...'}
+                          {blockchainStep === 'success' && 'Project Live!'}
+                          {loading && blockchainStep === 'idle' && 'Posting...'}
+                          {!loading && 'Post Project'}
                         </Button>
                       </div>
                     ) : (
