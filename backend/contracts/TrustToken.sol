@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/**
+ * @title MinimalTrustToken
+ * @dev Extremely gas-efficient ERC20 implementation for Shardeum limits.
+ */
 contract TrustToken {
-    string public constant name = "TrustToken";
+    string public constant name = "TrustLance Token";
     string public constant symbol = "TRT";
     uint8 public constant decimals = 18;
-    uint256 public constant totalSupply = 1000000 * 10**18;
+    uint256 public totalSupply;
+    address public owner;
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -14,15 +19,12 @@ contract TrustToken {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     constructor() {
-        balanceOf[msg.sender] = totalSupply;
-        emit Transfer(address(0), msg.sender, totalSupply);
+        owner = msg.sender;
+        _mint(msg.sender, 1000000 * 10 ** 18);
     }
 
     function transfer(address to, uint256 value) public returns (bool) {
-        require(balanceOf[msg.sender] >= value, "Low bal");
-        balanceOf[msg.sender] -= value;
-        balanceOf[to] += value;
-        emit Transfer(msg.sender, to, value);
+        _transfer(msg.sender, to, value);
         return true;
     }
 
@@ -33,12 +35,27 @@ contract TrustToken {
     }
 
     function transferFrom(address from, address to, uint256 value) public returns (bool) {
-        require(value <= allowance[from][msg.sender], "Low allow");
-        require(balanceOf[from] >= value, "Low bal");
+        require(value <= allowance[from][msg.sender], "Allowance exceeded");
         allowance[from][msg.sender] -= value;
+        _transfer(from, to, value);
+        return true;
+    }
+
+    function _transfer(address from, address to, uint256 value) internal {
+        require(balanceOf[from] >= value, "Balance exceeded");
         balanceOf[from] -= value;
         balanceOf[to] += value;
         emit Transfer(from, to, value);
-        return true;
+    }
+
+    function _mint(address account, uint256 value) internal {
+        totalSupply += value;
+        balanceOf[account] += value;
+        emit Transfer(address(0), account, value);
+    }
+
+    function mint(address to, uint256 amount) public {
+        require(msg.sender == owner, "Only owner");
+        _mint(to, amount);
     }
 }

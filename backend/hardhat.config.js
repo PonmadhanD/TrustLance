@@ -32,6 +32,13 @@ module.exports = {
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 137
     },
+    // Shardeum Mainnet
+    shardeum: {
+      url: "https://api.shardeum.org",
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
+      chainId: 8118,
+      gasPrice: 20000000000 // 20 gwei
+    },
     // Local Hardhat Network (Testing)
     hardhat: {
       chainId: 1337
