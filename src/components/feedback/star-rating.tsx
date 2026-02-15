@@ -1,5 +1,5 @@
---Star Rating Component
---Reusable component for displaying and inputting star ratings with half - star support
+// Star Rating Component
+// Reusable component for displaying and inputting star ratings with half-star support
 
 "use client";
 
@@ -145,4 +145,3 @@ export function StarDisplay({
         />
     );
 }
- 

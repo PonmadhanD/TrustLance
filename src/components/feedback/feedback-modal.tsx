@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StarRating } from './star-rating';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface FeedbackModalProps {
@@ -371,4 +371,3 @@ export function FeedbackModal({
         </Dialog>
     );
 }
- 

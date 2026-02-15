@@ -51,17 +51,6 @@ const clientDisputeTypes = [
   { value: 'refund_not_processed', label: 'Refund not processed' }
 ];
 
-<<<<<<< Updated upstream
-interface AiAnalysis {
-  riskScore: number;
-  likelyFault: string;
-  faultPercentage: number;
-  suggestedResolution: string;
-  confidence: string;
-  similarCases: number;
-  estimatedResolution: string;
-}
-=======
 const MOCK_PROJECTS = [
   {
     id: 'mock-1',
@@ -87,7 +76,6 @@ const MOCK_PROJECTS = [
     ]
   }
 ];
->>>>>>> Stashed changes
 
 export default function NewDisputePage() {
   const router = useRouter();
@@ -107,9 +95,6 @@ export default function NewDisputePage() {
     description: '',
     attachments: []
   });
-<<<<<<< Updated upstream
-  const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
-=======
 
   // Fetch projects on mount
   useEffect(() => {
@@ -168,7 +153,6 @@ export default function NewDisputePage() {
     verdict: 'freelancer' | 'client' | 'partial';
     confidence: string;
   } | null>(null);
->>>>>>> Stashed changes
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userDecision, setUserDecision] = useState<'accept' | 'appeal' | null>(null);
 

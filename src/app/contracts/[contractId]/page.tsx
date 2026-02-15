@@ -30,8 +30,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { AgreementModal } from "@/components/dashboard/agreement-modal";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+// Imports removed for dynamic loading
 import { format } from "date-fns";
 import {
     AlertDialog,
@@ -367,8 +366,11 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
         }
     };
 
-    const downloadAgreement = () => {
+    const downloadAgreement = async () => {
         if (!contract) return;
+
+        const { jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
 
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();

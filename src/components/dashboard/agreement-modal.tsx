@@ -22,8 +22,7 @@ import {
     Wallet,
     Hash
 } from "lucide-react";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+// Imports removed for dynamic loading
 import { format } from "date-fns";
 
 interface AgreementModalProps {
@@ -53,8 +52,10 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
         }
     };
 
-    const generatePDF = () => {
+    const generatePDF = async () => {
         setIsGenerating(true);
+        const { jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -256,4 +257,3 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
         </Dialog>
     );
 }
- 

@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, CheckCircle, AlertOctagon, Download, ShieldAlert } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Imports removed for dynamic loading
 
 interface RiskReport {
     risk_level: 'LOW' | 'MEDIUM' | 'HIGH';
@@ -36,8 +35,11 @@ export function RiskAnalysisModal({ isOpen, onClose, onProceed, report, isLoadin
         }
     }, [report, isLoading, error, autoDownload]);
 
-    const downloadPDF = () => {
+    const downloadPDF = async () => {
         if (!report) return;
+
+        const { default: jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
 
         const doc = new jsPDF();
 
@@ -206,4 +208,3 @@ export function RiskAnalysisModal({ isOpen, onClose, onProceed, report, isLoadin
         </Dialog>
     );
 }
- 

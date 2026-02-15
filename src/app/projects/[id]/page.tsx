@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, use } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,8 @@ interface ProjectPageProps {
 
 export default function ProjectPage({ params }: ProjectPageProps) {
   const { id } = use(params);
+  const router = useRouter();
+  const { openChat } = useChat();
   const [projectCreated, setProjectCreated] = useState(false);
 
   // Mock project data
@@ -47,11 +50,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     // Simulate project creation process
     setTimeout(() => {
       // Redirect to workspace
-<<<<<<< Updated upstream
-      window.location.href = `/projects/${id}/workspace`;
-=======
-      router.push(`/projects/${params.id}/workspace`);
->>>>>>> Stashed changes
+      router.push(`/projects/${id}/workspace`);
     }, 2000);
   };
 

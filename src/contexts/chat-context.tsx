@@ -14,6 +14,7 @@ interface ChatContextType {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
     activeConversationId: string | null;
+    setActiveConversationId: (id: string | null) => void;
     openChat: (projectId: string, withUser: ChatUser, projectTitle: string) => void;
     closeChat: () => void;
 }
@@ -39,7 +40,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <ChatContext.Provider value={{ isOpen, setIsOpen, activeConversationId, openChat, closeChat }}>
+        <ChatContext.Provider value={{ isOpen, setIsOpen, activeConversationId, setActiveConversationId, openChat, closeChat }}>
             {children}
         </ChatContext.Provider>
     );
@@ -52,4 +53,3 @@ export function useChat() {
     }
     return context;
 }
- 

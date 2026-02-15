@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import Image from "next/image";
 import { useAuth } from '@/contexts/auth-context';
 import { useWallet } from '@/contexts/wallet-context';
 import { TokenInput } from '@/components/ui/token-input';
@@ -341,7 +342,15 @@ const Step8Agreement = React.memo(({ signature, onShowAgreement }: any) => (
       ) : (
         <div className="space-y-4">
           <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100"><Check className="h-5 w-5 text-green-600" /><span className="text-sm font-bold text-green-800">Agreement Digitally Signed Successfully</span><Button variant="ghost" size="sm" onClick={onShowAgreement} className="ml-auto text-xs text-green-700 underline">Update Signature</Button></div>
-          <div className="border rounded-xl p-4 bg-gray-50 flex items-center justify-center h-32"><img src={signature} alt="Signature" className="max-h-full object-contain mix-blend-multiply" /></div>
+          <div className="border rounded-xl p-4 bg-gray-50 flex items-center justify-center h-32 relative">
+            <Image
+              src={signature}
+              alt="Signature"
+              fill
+              className="object-contain mix-blend-multiply"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -601,4 +610,3 @@ export default function PostProjectPage() {
     </div>
   );
 }
- 

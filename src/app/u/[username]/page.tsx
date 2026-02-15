@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from "next/image";
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import AuthenticatedHeader from '@/components/layout/authenticated-header';
@@ -345,7 +346,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                                     <Card key={item.id} className="overflow-hidden hover:shadow-md transition-all border-slate-200 group flex flex-col h-full">
                                                         <div className="h-40 bg-slate-100 relative overflow-hidden">
                                                             {item.thumbnail_url ? (
-                                                                <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                                <div className="relative w-full h-full">
+                                                                    <Image
+                                                                        src={item.thumbnail_url}
+                                                                        alt={item.title}
+                                                                        fill
+                                                                        className="object-cover transition-transform group-hover:scale-105"
+                                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                                    />
+                                                                </div>
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center bg-gray-50">
                                                                     <Briefcase className="h-10 w-10 text-gray-300" />
