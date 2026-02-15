@@ -1,4 +1,4 @@
-# **App Name**: TrustLance
+# **App Name**:  TrustLance
 
 ## Core Features:
 
