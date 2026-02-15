@@ -20,11 +20,17 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
     };
 
     const save = () => {
-        if (sigCanvas.current?.isEmpty()) {
+        if (!sigCanvas.current) {
+            console.error("SignatureCanvas ref is null");
             return;
         }
-        const signatureData = sigCanvas.current?.getTrimmedCanvas().toDataURL("image/png") || "";
-        console.log("Signature saved, length:", signatureData.length);
+        if (sigCanvas.current.isEmpty()) {
+            console.log("SignatureCanvas is empty");
+            // Optional: Don't return if we want to allow clearing? No, empty signature invalid.
+            return;
+        }
+        const signatureData = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+        console.log("Signature captured, length:", signatureData.length);
         onSave(signatureData);
     };
 
@@ -58,9 +64,21 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
                 />
             </div>
 
-            <p className="text-[10px] text-slate-400 font-medium text-center italic">
-                By signing here, you agree to the terms of the service agreement.
-            </p>
-        </div>
+            <div className="flex justify-between items-center px-2">
+                <p className="text-[10px] text-slate-400 font-medium italic">
+                    Sign above. If button stays disabled, click "Save Signature".
+                </p>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={save}
+                    className="h-8 text-xs"
+                >
+                    Save Signature
+                </Button>
+            </div>
+            By signing here, you agree to the terms of the service agreement.
+        </p>
+        </div >
     );
 }

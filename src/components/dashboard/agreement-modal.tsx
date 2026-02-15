@@ -241,6 +241,15 @@ export function AgreementModal({ isOpen, onClose, onSign, isSigning, data, userR
                         />
 
                         <div className="mt-8 space-y-3">
+                            <div className="mb-2 text-center">
+                                {signature ? (
+                                    <span className="text-green-600 text-xs font-bold flex items-center justify-center gap-1">
+                                        <ShieldCheck className="h-3 w-3" /> Signature Captured Ready to Sign
+                                    </span>
+                                ) : (
+                                    <span className="text-amber-600 text-xs font-bold">Waiting for signature...</span>
+                                )}
+                            </div>
                             <Button
                                 className="w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-200"
                                 disabled={!signature || isSigning}
