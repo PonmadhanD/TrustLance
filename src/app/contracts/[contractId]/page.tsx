@@ -29,7 +29,7 @@ import {
     MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
-import { AgreementModal } from "@/components/dashboard/agreement-modal";
+// AgreementModal import removed
 // Imports removed for dynamic loading
 import { format } from "date-fns";
 import {
@@ -135,9 +135,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
     // const [disputeReason, setDisputeReason] = useState(""); // Removed
     // const [disputeDomain, setDisputeDomain] = useState("Web Development"); // Removed
 
-    // Agreement Signing State
-    const [showSigningModal, setShowSigningModal] = useState(false);
-    const [isSigning, setIsSigning] = useState(false);
+    // Agreement Signing State - REMOVED
+    // const [showSigningModal, setShowSigningModal] = useState(false);
+    // const [isSigning, setIsSigning] = useState(false);
 
     // Feedback State
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -341,30 +341,12 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
         }
     };
 
+    // Signature handler removed as per user request
+    /*
     const handleFreelancerSign = async (signature: string) => {
-        try {
-            setIsSigning(true);
-            const response = await fetch(`/api/contracts/${contractId}/sign`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ signature })
-            });
-
-            if (response.ok) {
-                showNotification('Agreement Digitally Signed!');
-                setShowSigningModal(false);
-                fetchContract();
-            } else {
-                const error = await response.json();
-                showNotification(`Signing failed: ${error.error}`, 'error');
-            }
-        } catch (error) {
-            console.error('Error signing:', error);
-            showNotification('Failed to sign agreement', 'error');
-        } finally {
-            setIsSigning(false);
-        }
+        ... removed code ...
     };
+    */
 
     const downloadAgreement = async () => {
         if (!contract) return;
@@ -502,17 +484,10 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                                 <CardTitle className="text-2xl mb-2">{contract.project?.title}</CardTitle>
                                 <div className="flex items-center gap-4 mt-1">
                                     <p className="text-gray-600">ID: {contractId.substring(0, 8)}</p>
-                                    {contract.freelancer_signature ? (
-                                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 flex items-center gap-1">
-                                            <ShieldCheck className="h-3 w-3" />
-                                            Contract Signed
-                                        </Badge>
-                                    ) : (
-                                        <Badge variant="outline" className="text-amber-600 border-amber-600 flex items-center gap-1">
-                                            <Clock className="h-3 w-3" />
-                                            Awaiting Signature
-                                        </Badge>
-                                    )}
+                                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 flex items-center gap-1">
+                                        <ShieldCheck className="h-3 w-3" />
+                                        Contract Active
+                                    </Badge>
                                 </div>
                             </div>
                             <div className="flex gap-2">
@@ -881,60 +856,6 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                 )
             }
 
-            <AgreementModal
-                isOpen={showSigningModal}
-                onClose={() => setShowSigningModal(false)}
-                onSign={handleFreelancerSign}
-                isSigning={isSigning}
-                userRole={isClient ? 'client' : 'freelancer'}
-                data={{
-                    clientName: contract.client?.name || 'Client',
-                    clientWallet: contract.client?.wallet_address || '0x...',
-                    freelancerName: contract.freelancer?.name || 'Freelancer',
-                    freelancerWallet: contract.freelancer?.wallet_address || '0x...',
-                    projectId: contract.id,
-                    projectTitle: contract.project?.title || '',
-                    projectDescription: contract.project?.description || '',
-                    milestones: contract.milestones.map(m => ({
-                        title: m.title,
-                        description: m.description,
-                        tokens: Math.round(m.amount / 10) // 1 Token = ₹10
-                    }))
-                }}
-            />
-
-            {/* Sign Prompt for Freelancer OR Client */}
-            {
-                ((isFreelancer && !contract.freelancer_signature) || (isClient && !contract.client_signature)) && (
-                    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <Card className="max-w-md w-full border-none shadow-2xl rounded-[32px] overflow-hidden">
-                            <div className="bg-blue-600 p-8 text-white text-center">
-                                <div className="h-16 w-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
-                                    <FileText className="h-8 w-8 text-white" />
-                                </div>
-                                <h2 className="text-2xl font-black mb-2 uppercase tracking-tight">Signature Required</h2>
-                                <p className="text-blue-100 text-sm font-bold">You must sign the Digital Service Agreement before proceeding.</p>
-                            </div>
-                            <CardContent className="p-8 space-y-4">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-slate-600">
-                                        <div className="h-2 w-2 rounded-full bg-blue-500" />
-                                        <p className="text-xs font-bold uppercase tracking-widest">Legally Binding</p>
-                                    </div>
-                                    <p className="text-xs text-slate-500 leading-relaxed">By signing, you agree to the milestone structure, token-based payment model, and intellectual property transfer upon project completion.</p>
-                                </div>
-                                <Button
-                                    className="w-full h-12 rounded-2xl bg-slate-900 hover:bg-blue-700 text-white font-black uppercase text-xs tracking-widest shadow-xl transition-all"
-                                    onClick={() => setShowSigningModal(true)}
-                                    disabled={isSigning}
-                                >
-                                    {isSigning ? "Signing..." : "Proceed to Sign"}
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </div>
-                )
-            }
             {/* Feedback Modal */}
             {
                 contract && (
