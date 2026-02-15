@@ -270,23 +270,32 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
       const eth = window.ethereum;
-      eth.request({ method: 'eth_chainId' }).then((id: string) => {
-        setCurrentChainId(parseInt(id, 16).toString());
-      });
+      try {
+        eth.request({ method: 'eth_chainId' })
+          .then((id: string) => {
+            setCurrentChainId(parseInt(id, 16).toString());
+          })
+          .catch((err: any) => console.error("Error fetching chainId:", err));
 
-      const handleChainChanged = (id: string) => {
-        const newId = parseInt(id, 16).toString();
-        setCurrentChainId(newId);
-        console.log(`Chain changed to: ${newId}. Refreshing balance...`);
-        refreshBalance();
-      };
+        const handleChainChanged = (id: string) => {
+          const newId = parseInt(id, 16).toString();
+          setCurrentChainId(newId);
+          console.log(`Chain changed to: ${newId}. Refreshing balance...`);
+          refreshBalance();
+        };
 
-      eth.on('chainChanged', handleChainChanged);
-      return () => {
-        if (eth.removeListener) {
-          eth.removeListener('chainChanged', handleChainChanged);
+        if (eth.on) {
+          eth.on('chainChanged', handleChainChanged);
         }
-      };
+
+        return () => {
+          if (eth.removeListener) {
+            eth.removeListener('chainChanged', handleChainChanged);
+          }
+        };
+      } catch (err) {
+        console.error("Error setting up wallet listeners:", err);
+      }
     }
   }, []);
 
