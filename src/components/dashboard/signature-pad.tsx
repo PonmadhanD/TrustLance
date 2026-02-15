@@ -77,8 +77,9 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
                     Save Signature
                 </Button>
             </div>
-            By signing here, you agree to the terms of the service agreement.
-        </p>
-        </div >
+            <p className="text-[10px] text-slate-400 font-medium text-center italic mt-2">
+                By signing here, you agree to the terms of the service agreement.
+            </p>
+        </div>
     );
 }
