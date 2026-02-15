@@ -29,6 +29,7 @@ interface AgreementModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSign: (signature: string) => void;
+    isSigning: boolean;
     data: {
         clientName: string;
         clientWallet: string;
@@ -42,7 +43,7 @@ interface AgreementModalProps {
     userRole: 'client' | 'freelancer';
 }
 
-export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: AgreementModalProps) {
+export function AgreementModal({ isOpen, onClose, onSign, isSigning, data, userRole }: AgreementModalProps) {
     const [signature, setSignature] = useState<string | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -242,10 +243,10 @@ export function AgreementModal({ isOpen, onClose, onSign, data, userRole }: Agre
                         <div className="mt-8 space-y-3">
                             <Button
                                 className="w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-200"
-                                disabled={!signature}
+                                disabled={!signature || isSigning}
                                 onClick={handleSign}
                             >
-                                Confirm & Digital Sign
+                                {isSigning ? "Signing..." : "Confirm & Digital Sign"}
                             </Button>
                             <Button variant="ghost" className="w-full h-12 text-slate-400 font-bold" onClick={onClose}>
                                 Review Later

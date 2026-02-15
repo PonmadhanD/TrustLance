@@ -24,6 +24,7 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
             return;
         }
         const signatureData = sigCanvas.current?.getTrimmedCanvas().toDataURL("image/png") || "";
+        console.log("Signature saved, length:", signatureData.length);
         onSave(signatureData);
     };
 
@@ -63,4 +64,3 @@ export function SignaturePad({ onSave, onClear, label = "Sign below" }: Signatur
         </div>
     );
 }
- 

@@ -885,6 +885,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ contr
                 isOpen={showSigningModal}
                 onClose={() => setShowSigningModal(false)}
                 onSign={handleFreelancerSign}
+                isSigning={isSigning}
                 userRole={isClient ? 'client' : 'freelancer'}
                 data={{
                     clientName: contract.client?.name || 'Client',

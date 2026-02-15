@@ -40,7 +40,19 @@ export async function PATCH(
         } else if (existingContract.client_id === user.id) {
             updateData = { client_signature: signature, client_signed_at: new Date().toISOString() };
         } else {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+            console.error('Sign Unauthorized:', {
+                user: user.id,
+                freelancer: existingContract.freelancer_id,
+                client: existingContract.client_id
+            });
+            return NextResponse.json({
+                error: 'Unauthorized - You are not a party to this contract',
+                details: {
+                    userId: user.id,
+                    contractFreelancerId: existingContract.freelancer_id,
+                    contractClientId: existingContract.client_id
+                }
+            }, { status: 403 });
         }
 
         // Update contract with signature
